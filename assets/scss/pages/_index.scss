@@ -338,6 +338,204 @@
 
 }
 
+#platform {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    padding: 0 0 160px;
+    background:
+        radial-gradient(circle at 72% 26%, rgba(96, 74, 198, 0.20) 0%, transparent 46%),
+        radial-gradient(circle at 12% 70%, rgba(58, 92, 200, 0.16) 0%, transparent 45%),
+        linear-gradient(180deg, #0a1340 0%, #0b1248 48%, #090f3a 100%);
+
+    .platform__mesh {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.55;
+        mix-blend-mode: screen;
+        mask-image: linear-gradient(180deg, #000 0%, #000 82%, rgba(0, 0, 0, 0.2) 100%);
+    }
+
+    .platform__mesh-canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    .platform__marquee {
+        position: absolute;
+        top: 12px;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        z-index: 1;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .platform__marquee-track {
+        display: flex;
+        width: max-content;
+
+        span {
+            flex-shrink: 0;
+            padding-right: 0.45em;
+            font-family: futura-regular;
+            font-size: 120px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            background: linear-gradient(90deg, rgba(120, 150, 230, 0.18) 0%, rgba(160, 180, 255, 0.5) 70%, rgba(200, 220, 255, 0.62) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+
+            @include lg {
+                font-size: 74px;
+            }
+        }
+    }
+
+    .platform__inner {
+        position: relative;
+        z-index: 2;
+    }
+
+    .platform__head {
+        padding-top: 175px;
+
+        @include lg {
+            padding-top: 120px;
+        }
+    }
+
+    .platform__title {
+        font-family: kozuka-bold;
+        font-size: 80px;
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: 0.02em;
+        color: #fff;
+
+        @include md {
+            font-size: 52px;
+        }
+    }
+
+    .platform__subtitle {
+        margin-top: 16px;
+        font-family: kozuka-bold;
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .platform__flow {
+        position: relative;
+        margin-top: 40px;
+    }
+
+    .platform__stream {
+        position: absolute;
+        top: -60px;
+        bottom: -120px;
+        left: 67%;
+        transform: translateX(-50%);
+        width: 280px;
+        z-index: 1;
+        pointer-events: none;
+
+        img {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        @include lg {
+            display: none;
+        }
+    }
+
+    .platform__step {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        min-height: 340px;
+
+        & + .platform__step {
+            margin-top: 96px;
+        }
+
+        @include lg {
+            flex-direction: column;
+            align-items: flex-start;
+            min-height: auto;
+
+            & + .platform__step {
+                margin-top: 64px;
+            }
+        }
+    }
+
+    .platform__step-text {
+        width: 42%;
+        flex-shrink: 0;
+
+        @include lg {
+            width: 100%;
+            order: 2;
+        }
+    }
+
+    .platform__step-title {
+        font-family: kozuka-bold;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.5;
+        color: #fff;
+        margin-bottom: 22px;
+
+        @include md {
+            font-size: 22px;
+        }
+    }
+
+    .platform__step-desc {
+        font-family: kozuka-bold;
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.9;
+        color: #fff;
+
+        @include md {
+            font-size: 14px;
+        }
+    }
+
+    .platform__step-art {
+        width: 38%;
+        margin-left: 6%;
+        display: flex;
+        justify-content: center;
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+
+        @include lg {
+            width: 78%;
+            max-width: 420px;
+            margin: 0 auto;
+            order: 1;
+        }
+    }
+}
+
 #sdg {
     position: relative;
     width: 100%;

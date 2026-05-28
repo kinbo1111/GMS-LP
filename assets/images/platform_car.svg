@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 360" width="420" height="360">
+  <defs>
+    <linearGradient id="carBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#33489f"/>
+      <stop offset="1" stop-color="#161f52"/>
+    </linearGradient>
+    <linearGradient id="carGlass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2a66"/>
+      <stop offset="1" stop-color="#0a1138"/>
+    </linearGradient>
+    <linearGradient id="dev" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#dfe7f5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- MCCS device -->
+  <g>
+    <rect x="170" y="26" width="118" height="66" rx="12" fill="url(#dev)" stroke="#c3cee6" stroke-width="1"/>
+    <text x="229" y="58" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#2f5bd0">MCCS</text>
+    <rect x="196" y="78" width="22" height="6" rx="2" fill="#f29a3c"/>
+    <rect x="222" y="78" width="22" height="6" rx="2" fill="#3f7ad6"/>
+    <!-- cable to roof -->
+    <path d="M229 92 C 229 120 232 132 250 150" fill="none" stroke="#46d6ec" stroke-width="2" stroke-dasharray="2 5" stroke-linecap="round"/>
+    <circle cx="250" cy="150" r="3.5" fill="#46d6ec"/>
+  </g>
+
+  <!-- underglow -->
+  <ellipse cx="225" cy="300" rx="160" ry="20" fill="#46d6ec" opacity="0.16"/>
+
+  <!-- car -->
+  <g>
+    <!-- body -->
+    <path d="M72 280
+             C 70 250 92 244 120 240
+             C 150 200 200 184 250 188
+             C 300 192 330 214 366 248
+             C 380 258 384 270 382 282
+             C 382 296 368 300 352 300
+             L 100 300
+             C 82 300 72 294 72 280 Z" fill="url(#carBody)" stroke="#46d6ec" stroke-width="1.2" opacity="0.98"/>
+    <!-- cabin glass -->
+    <path d="M150 232 C 178 204 214 196 248 200 C 286 204 312 222 336 246 L 150 246 Z" fill="url(#carGlass)"/>
+    <!-- belt line LED -->
+    <path d="M120 250 C 180 244 300 246 360 256" fill="none" stroke="#5fe0f2" stroke-width="2" opacity="0.85"/>
+    <!-- front LED headlight -->
+    <path d="M372 256 C 380 262 382 270 380 278" fill="none" stroke="#9af0ff" stroke-width="3.5" stroke-linecap="round"/>
+    <!-- wheels -->
+    <g>
+      <ellipse cx="140" cy="302" rx="30" ry="30" fill="#0c1334"/>
+      <ellipse cx="140" cy="302" rx="30" ry="30" fill="none" stroke="#3aa6cc" stroke-width="3"/>
+      <circle cx="140" cy="302" r="11" fill="#1b2a66"/>
+    </g>
+    <g>
+      <ellipse cx="318" cy="302" rx="30" ry="30" fill="#0c1334"/>
+      <ellipse cx="318" cy="302" rx="30" ry="30" fill="none" stroke="#3aa6cc" stroke-width="3"/>
+      <circle cx="318" cy="302" r="11" fill="#1b2a66"/>
+    </g>
+  </g>
+</svg>
