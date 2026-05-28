@@ -345,6 +345,7 @@ fieldset {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  z-index: 2;
 }
 #first-view .first-view__inner .first-view__content {
   width: 50%;
