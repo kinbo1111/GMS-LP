@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Data Network Wave Mesh - Deploy Version</title>
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* 【システム実装用の背景透過設定】
+    親要素や既存の背景デザインの上に重ねるため、背景を完全に透過（transparent）にしています。
+  */
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent; 
+  }
+
+  /* Canvasを画面全体に固定配置します。
+    ※下のレイヤーにあるボタンやリンク等のクリックを透過させたい場合は、
+      必要に応じて「pointer-events: none;」を付与してください。
+      （ただし、その場合はJavaScript側のclickイベントによるパルス効果は無効化されます）
+  */
+  canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10; /* 既存コンテンツとの兼ね合いで調整してください */
+    background: transparent; 
+  }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let w, h;
+let points = [];
+let grid = []; // 効率的な三角形（面）生成のための2次元配列格子
+let then = 0;
+
+// ==========================================
+//  【カスタマイズ用 各種パラメータ調整】
+// ==========================================
+const spacing = 100;      // ノード（点）の間隔（小さいほど高密度・高負荷になります）
+const baseHue = 195;      // 配色のベースとなるカラー（HSLAのHue値: 195はシアン・ブルー系）
+const maxDistance = 150;  // 隣り合うノードを結ぶ最大距離
+const waveSpeed = 0.00125;
+const depthAmplitude = 16;
+const mouseRadius = 160;
+const pulseBand = 28;
+
+// インタラクション（マウス・クリックパルス）管理用オブジェクト
+const mouse = { x: -9999, y: -9999 };
+const pulse = { x: 0, y: 0, radius: 0, maxRadius: 0, active: false };
+
+// 画面リサイズ処理
+function resize(){
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+  generatePoints();
+}
+window.addEventListener("resize", resize);
+
+// マウス移動検知（カーソル周辺のノードをアクティブ化するため）
+window.addEventListener("mousemove", (e) => {
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+// クリックイベント：その座標からネットワーク上に電気信号（パルス波紋）を伝播させる
+window.addEventListener("click", (e) => {
+  pulse.x = e.clientX;
+  pulse.y = e.clientY;
+  pulse.radius = 0;
+  pulse.maxRadius = Math.sqrt(w * w + h * h) * 0.7; // 画面全体の約7割まで広げる
+  pulse.active = true;
+});
+
+// ノード（点）の初期生成ロジック
+function generatePoints(){
+  points = [];
+  grid = [];
+
+  // 画面端で描写が途切れないよう、上下左右に少し余白を持たせて格子状に生成
+  const cols = Math.ceil(w / spacing) + 3;
+  const rows = Math.ceil(h / spacing) + 3;
+
+  for(let y = 0; y < rows; y++){
+    grid[y] = [];
+    for(let x = 0; x < cols; x++){
+      const sample = Math.random();
+      const jitter = spacing * 0.6; // 規則的な格子を崩すための揺らぎ幅
+      
+      // 基本位置（原点）の計算
+      const px = (x - 1) * spacing + (Math.random() - 0.5) * jitter;
+      const py = (y - 1) * spacing + (Math.random() - 0.5) * jitter;
+
+      const p = {
+        ox: px, // オリジナルのX座標（波の計算基準）
+        oy: py, // オリジナルのY座標（波の計算基準）
+        x: px,  // アニメーション計算後の動的X座標
+        y: py,  // アニメーション計算後の動的Y座標
+        z: 0,   // 3D的な奥行き（Depth）パラメータ
+        seed: Math.random() * 9999, // ノードごとに動きのタイミングをズラすシード値
+        
+        // 【データ感の演出】確率でノードの種類（外見）を設定
+        // 1: 重要サーバー（二重丸）, 2: マイクロデータ（極小点）, 0: 通常ノード
+        type: sample > 0.93 ? 1 : (sample < 0.3 ? 2 : 0),
+        
+        hue: baseHue + Math.random() * 35, // 色相にわずかなランダム性を持たせて深みを出す
+        pulseProgress: 0                  // クリックパルスが衝突した際の発光強度
+      };
+      
+      points.push(p);
+      grid[y][x] = p;
+    }
+  }
+}
+
+function distance(a, b, c, d){
+  const dx = a - c;
+  const dy = b - d;
+  return Math.hypot(dx, dy);
+}
+
+function updatePoints(time){
+  for(let i = 0; i < points.length; i++){
+    const p = points[i];
+    const t = time * waveSpeed + p.seed;
+
+    // ベースのゆらぎ（波）
+    const waveX = Math.sin(t * 1.2 + p.oy * 0.01) * 6;
+    const waveY = Math.cos(t * 1.05 + p.ox * 0.01) * 6;
+    const z = Math.sin(t + (p.ox + p.oy) * 0.004) * depthAmplitude;
+
+    // マウス寄りで少し引き寄せる
+    const md = distance(p.ox, p.oy, mouse.x, mouse.y);
+    const influence = Math.max(0, 1 - md / mouseRadius);
+    const mx = (mouse.x - p.ox) * influence * 0.06;
+    const my = (mouse.y - p.oy) * influence * 0.06;
+
+    p.z = z;
+    p.x = p.ox + waveX + mx;
+    p.y = p.oy + waveY + my;
+
+    // クリックパルスの発光帯
+    if(pulse.active){
+      const pd = distance(p.ox, p.oy, pulse.x, pulse.y);
+      const ring = Math.abs(pd - pulse.radius);
+      p.pulseProgress = Math.max(0, 1 - ring / pulseBand);
+    } else {
+      p.pulseProgress *= 0.9;
+    }
+  }
+}
+
+function drawTriangle(a, b, c, avgZ, pulseAlpha){
+  // 面は薄く、線でメッシュ感を出す
+  const light = 0.1 + ((avgZ + depthAmplitude) / (depthAmplitude * 2)) * 0.12;
+  const glow = pulseAlpha * 0.22;
+  const alpha = Math.min(0.32, light + glow);
+
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.lineTo(c.x, c.y);
+  ctx.closePath();
+  ctx.fillStyle = `hsla(${baseHue + 8}, 80%, 55%, ${alpha})`;
+  ctx.fill();
+
+  const strokeAlpha = Math.min(0.55, 0.12 + light + pulseAlpha * 0.35);
+  ctx.strokeStyle = `hsla(${baseHue}, 92%, 68%, ${strokeAlpha})`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
+
+function drawNodes(){
+  for(let i = 0; i < points.length; i++){
+    const p = points[i];
+    const pulseBoost = p.pulseProgress * 0.9;
+    let r = 1.3;
+    let alpha = 0.32 + pulseBoost;
+
+    if(p.type === 1){
+      r = 3.2 + pulseBoost * 2.5;
+      alpha = 0.45 + pulseBoost;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r + 3.3, 0, Math.PI * 2);
+      ctx.strokeStyle = `hsla(${p.hue}, 95%, 78%, ${0.22 + pulseBoost * 0.8})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else if(p.type === 2){
+      r = 0.9 + pulseBoost * 1.3;
+      alpha = 0.28 + pulseBoost * 0.9;
+    } else {
+      r = 1.8 + pulseBoost * 1.6;
+    }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `hsla(${p.hue}, 100%, 80%, ${Math.min(1, alpha)})`;
+    ctx.fill();
+  }
+}
+
+// 描画管理のメイン関数（負荷対策のため、ループ内の独立処理を最適化）
+function drawMesh(){
+  const rows = grid.length;
+
+  // 1. 三角形（面と線）のインデックス描画
+  for(let y = 0; y < rows - 1; y++){
+    if(!grid[y] || !grid[y+1]) continue;
+    const cols = grid[y].length;
+    
+    for(let x = 0; x < cols - 1; x++){
+      const p1 = grid[y][x];
+      const p2 = grid[y][x+1];
+      const p3 = grid[y+1][x];
+      const p4 = grid[y+1][x+1];
+
+      if(!p1 || !p2 || !p3 || !p4) continue;
+
+      // 離れすぎる三角形は除外して破綻を回避
+      if(
+        distance(p1.x, p1.y, p2.x, p2.y) > maxDistance ||
+        distance(p1.x, p1.y, p3.x, p3.y) > maxDistance ||
+        distance(p2.x, p2.y, p4.x, p4.y) > maxDistance ||
+        distance(p3.x, p3.y, p4.x, p4.y) > maxDistance
+      ){
+        continue;
+      }
+
+      // 3点のz軸（奥行き）の平均値からライティング（明暗・透明度）を計算
+      const avgZ1 = (p1.z + p2.z + p3.z) / 3;
+      const avgZ2 = (p2.z + p4.z + p3.z) / 3;
+
+      // パルス（クリック波紋）の伝播具合を平均化
+      const pAlpha1 = (p1.pulseProgress + p2.pulseProgress + p3.pulseProgress) / 3;
+      const pAlpha2 = (p2.pulseProgress + p4.pulseProgress + p3.pulseProgress) / 3;
+
+      drawTriangle(p1, p2, p3, avgZ1, pAlpha1);
+      drawTriangle(p2, p4, p3, avgZ2, pAlpha2);
+    }
+  }
+}
+
+function animate(now){
+  const dt = now - then;
+  then = now;
+
+  ctx.clearRect(0, 0, w, h);
+  updatePoints(now);
+  drawMesh();
+  drawNodes();
+
+  if(pulse.active){
+    pulse.radius += Math.max(2.5, dt * 0.35);
+    if(pulse.radius > pulse.maxRadius){
+      pulse.active = false;
+      pulse.radius = 0;
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+// エントリーポイント（初期化とループ開始）
+resize();
+animate(0);
+</script>
+
+</body>
+</html>
