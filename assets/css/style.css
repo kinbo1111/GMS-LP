@@ -1244,7 +1244,7 @@ fieldset {
   left: 0;
   width: 100%;
   z-index: 100;
-  padding: 32px 0;
+  padding: 24px 0;
 }
 #header .header__inner {
   position: relative;
@@ -1253,6 +1253,7 @@ fieldset {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 12px 0;
 }
 #header .header__inner .header__logo {
   width: 164px;
@@ -1264,6 +1265,7 @@ fieldset {
 }
 #header .header__inner .header__nav ul {
   display: flex;
+  align-items: center;
   gap: 40px;
 }
 #header .header__inner .header__nav ul li a {
@@ -1272,10 +1274,15 @@ fieldset {
   font-weight: 700;
   color: #fff;
 }
+#header .header__inner .header__lang {
+  position: absolute;
+  top: 0;
+  right: 116px;
+}
 #header .header__inner .header__lang a {
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 600;
-  color: #000;
+  color: #fff;
 }
 
 /*# sourceMappingURL=style.css.map */
