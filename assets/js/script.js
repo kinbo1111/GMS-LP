@@ -118,60 +118,133 @@
             return;
         }
 
-        const eyebrow = section.querySelector('[data-performance-eyebrow]');
-        const title = section.querySelector('[data-performance-title]');
-        const lead = section.querySelector('[data-performance-lead]');
-        const description = section.querySelector('[data-performance-description]');
-        const value = section.querySelector('[data-performance-value]');
-        const subvalue = section.querySelector('[data-performance-subvalue]');
-        const progressDots = section.querySelectorAll('.performance__progress span');
+        const list = section.querySelector('.performance__list');
+        const items = section.querySelectorAll('.performance__item');
+        const currentStep = section.querySelector('[data-performance-current]');
+        const totalStep = section.querySelector('[data-performance-total]');
+        if (!list || items.length === 0) {
+            return;
+        }
 
-        const firstData = {
-            eyebrow: 'New',
-            title: 'Performance',
-            lead: 'GMSが世界を繋ぐ、モビリティデータの可能性。',
-            description: 'サービスを活用した<br>車両の総走行距離',
-            value: '0000万Km',
-            subvalue: '地球0周分'
-        };
+        const itemArray = Array.from(items);
+        const firstItem = itemArray[0];
+        const totalCount = itemArray.length;
 
-        // Requested behavior: prepare 4 scroll steps, each using the same first dataset for now.
-        const stepData = [firstData, firstData, firstData, firstData];
-        let activeStep = -1;
+        if (totalStep) {
+            totalStep.textContent = String(totalCount).padStart(2, '0');
+        }
 
-        const applyStep = (stepIndex) => {
-            if (stepIndex === activeStep || !stepData[stepIndex]) {
-                return;
-            }
-
-            const data = stepData[stepIndex];
-            if (eyebrow) eyebrow.textContent = data.eyebrow;
-            if (title) title.textContent = data.title;
-            if (lead) lead.textContent = data.lead;
-            if (description) description.innerHTML = data.description;
-            if (value) value.textContent = data.value;
-            if (subvalue) subvalue.textContent = data.subvalue;
-
-            progressDots.forEach((dot, index) => {
-                dot.classList.toggle('is-active', index === stepIndex);
+        if (!window.gsap || !window.ScrollTrigger || reduceMotion) {
+            itemArray.forEach((item, index) => {
+                item.style.opacity = index === 0 ? '1' : '0';
+                item.style.transform = 'none';
             });
+            if (currentStep) {
+                currentStep.textContent = '01';
+            }
+            return;
+        }
 
-            activeStep = stepIndex;
-        };
+        window.gsap.registerPlugin(window.ScrollTrigger);
 
-        const onScroll = () => {
-            const rect = section.getBoundingClientRect();
-            const viewHeight = window.innerHeight || 1;
-            const trackLength = Math.max(1, rect.height - viewHeight);
-            const progress = Math.min(Math.max(-rect.top / trackLength, 0), 0.9999);
-            const stepIndex = Math.min(3, Math.floor(progress * 4));
-            applyStep(stepIndex);
-        };
+        window.gsap.set(itemArray, {
+            autoAlpha: 0,
+            y: 0,
+            scale: 0.15,
+            transformOrigin: '50% 50%'
+        });
 
-        applyStep(0);
-        window.addEventListener('scroll', onScroll, { passive: true });
-        window.addEventListener('resize', onScroll);
-        onScroll();
+        itemArray.forEach((item, index) => {
+            item.style.zIndex = `${index + 1}`;
+        });
+
+        window.gsap.set(firstItem, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1
+        });
+
+        const timeline = window.gsap.timeline({
+            defaults: {
+                ease: 'power2.out',
+                duration: 1
+            },
+            scrollTrigger: {
+                trigger: section,
+                start: 'top top',
+                end: `+=${(totalCount - 1) * 110}%`,
+                scrub: 0.8,
+                pin: true,
+                anticipatePin: 1,
+                snap: {
+                    snapTo: totalCount > 1 ? 1 / (totalCount - 1) : 1,
+                    duration: {
+                        min: 0.12,
+                        max: 0.28
+                    },
+                    ease: 'power1.inOut'
+                },
+                onUpdate: (self) => {
+                    const stepIndex = Math.round(self.progress * (totalCount - 1));
+                    if (currentStep) {
+                        currentStep.textContent = String(stepIndex + 1).padStart(2, '0');
+                    }
+                }
+            }
+        });
+
+        for (let index = 1; index < totalCount; index += 1) {
+            timeline
+                .set(itemArray[index - 1], {
+                    autoAlpha: 0,
+                    scale: 0.78,
+                    y: 0
+                })
+                .to(itemArray[index], {
+                    autoAlpha: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.2,
+                    ease: 'power3.out'
+                });
+        }
+    };
+
+    const initSolutionSection = () => {
+        const section = document.querySelector('.solution');
+        if (!section) {
+            return;
+        }
+
+        const targets = section.querySelectorAll('.solution__visual, .solution__card');
+        if (!targets.length) {
+            return;
+        }
+
+        if (!window.gsap || !window.ScrollTrigger || reduceMotion) {
+            return;
+        }
+
+        window.gsap.registerPlugin(window.ScrollTrigger);
+
+        window.gsap.set(targets, {
+            autoAlpha: 0,
+            scale: 0.15,
+            transformOrigin: '50% 50%'
+        });
+
+        window.gsap.to(targets, {
+            autoAlpha: 1,
+            scale: 1,
+            duration: 0.28,
+            ease: 'power3.out',
+            stagger: 0.1,
+            scrollTrigger: {
+                trigger: section,
+                start: 'top 72%',
+                once: true
+            }
+        });
     };
 
     const initAppScene = () => {
@@ -260,6 +333,7 @@
 
     window.addEventListener('load', runIntroAnimation);
     window.addEventListener('load', initPerformanceSection);
+    window.addEventListener('load', initSolutionSection);
     window.addEventListener('load', initAppScene);
 
     if (!canvas || reduceMotion) {

@@ -5,7 +5,7 @@
 }
 
 html {
-  max-width: 1440px;
+  position: relative;
   overflow-x: hidden;
   width: 100%;
   margin: 0 auto;
@@ -27,14 +27,14 @@ html {
 
 body {
   margin: 0;
-  font-family: "Noto Sans JP", sans-serif;
+  font-family: kozuka-bold, sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
   font-size: 1.6rem;
   letter-spacing: 0;
   line-height: 1.5;
-  color: #008080;
+  color: #000;
   word-break: break-all;
   @include sm {
     font-size: 1.8rem;
