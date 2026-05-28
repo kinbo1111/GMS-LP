@@ -1238,6 +1238,10 @@ fieldset {
   color: #111;
 }
 
+body.is-nav-open {
+  overflow: hidden;
+}
+
 #header {
   position: fixed;
   top: 0;
@@ -1257,11 +1261,17 @@ fieldset {
 }
 #header .header__inner .header__logo {
   width: 164px;
+  z-index: 120;
 }
 #header .header__inner .header__logo img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+@media (max-width: 768px) {
+  #header .header__inner .header__logo {
+    width: 132px;
+  }
 }
 #header .header__inner .header__nav ul {
   display: flex;
@@ -1283,6 +1293,95 @@ fieldset {
   font-size: 18px;
   font-weight: 600;
   color: #fff;
+}
+#header .header__toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  z-index: 120;
+}
+#header .header__toggle span {
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+#header .header__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: rgba(4, 8, 28, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+@media (max-width: 1024px) {
+  #header {
+    padding: 12px 0;
+  }
+  #header .header__toggle {
+    display: flex;
+  }
+  #header .header__inner .header__nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 115;
+    width: min(82vw, 340px);
+    height: 100vh;
+    height: 100dvh;
+    padding: 104px 32px 48px;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #0a1a4a 0%, #060f38 100%);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    transition: transform 0.35s ease;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  #header .header__inner .header__nav ul {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 28px;
+  }
+  #header .header__inner .header__nav ul li a {
+    font-size: 20px;
+  }
+  #header .header__inner .header__nav .header__lang {
+    position: static;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    display: flex;
+    gap: 20px;
+  }
+}
+#header.is-open .header__inner .header__nav {
+  transform: translateX(0);
+}
+#header.is-open .header__overlay {
+  opacity: 1;
+  visibility: visible;
+}
+#header.is-open .header__toggle span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+#header.is-open .header__toggle span:nth-child(2) {
+  opacity: 0;
+}
+#header.is-open .header__toggle span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
 }
 
 /*# sourceMappingURL=style.css.map */

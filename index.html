@@ -14,7 +14,12 @@
             <div class="header__logo">
                 <img src="assets/images/logo.svg" alt="GMS">
             </div>
-            <div class="header__nav">
+            <button class="header__toggle" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="header-nav">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <nav id="header-nav" class="header__nav">
                 <ul class="header__nav-list">
                     <li class="header__nav-item"><a href="#company">会社情報</a></li>
                     <li class="header__nav-item"><a href="#business">事業・サービス</a></li>
@@ -27,8 +32,9 @@
                     <a href="#">EN</a>
                     <a href="#">JP</a>
                 </div>
-            </div>
+            </nav>
         </div>
+        <div class="header__overlay" aria-hidden="true"></div>
     </header>
     <main>
         <section id="first-view" class="first-view">

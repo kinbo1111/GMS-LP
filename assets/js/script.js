@@ -338,6 +338,53 @@
         onScroll();
     };
 
+    const initHeaderMenu = () => {
+        const header = document.getElementById('header');
+        if (!header) {
+            return;
+        }
+
+        const toggle = header.querySelector('.header__toggle');
+        const overlay = header.querySelector('.header__overlay');
+        const links = header.querySelectorAll('.header__nav a');
+        if (!toggle) {
+            return;
+        }
+
+        const setOpen = (open) => {
+            header.classList.toggle('is-open', open);
+            document.body.classList.toggle('is-nav-open', open);
+            toggle.setAttribute('aria-expanded', String(open));
+            toggle.setAttribute('aria-label', open ? 'メニューを閉じる' : 'メニューを開く');
+        };
+
+        toggle.addEventListener('click', () => {
+            setOpen(!header.classList.contains('is-open'));
+        });
+
+        overlay?.addEventListener('click', () => setOpen(false));
+        links.forEach((link) => link.addEventListener('click', () => setOpen(false)));
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                setOpen(false);
+            }
+        });
+
+        const desktopQuery = window.matchMedia('(min-width: 1025px)');
+        const handleViewportChange = () => {
+            if (desktopQuery.matches) {
+                setOpen(false);
+            }
+        };
+        if (desktopQuery.addEventListener) {
+            desktopQuery.addEventListener('change', handleViewportChange);
+        } else if (desktopQuery.addListener) {
+            desktopQuery.addListener(handleViewportChange);
+        }
+    };
+
+    window.addEventListener('DOMContentLoaded', initHeaderMenu);
     window.addEventListener('load', runIntroAnimation);
     window.addEventListener('load', initPerformanceSection);
     window.addEventListener('load', initSolutionMesh);
