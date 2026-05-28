@@ -475,11 +475,28 @@ fieldset {
 #solution {
   position: relative;
   width: 100%;
+  overflow: hidden;
   padding: 0 0 120px;
   background: radial-gradient(circle at 20% 30%, rgba(74, 118, 255, 0.18) 0%, transparent 45%), radial-gradient(circle at 80% 70%, rgba(120, 86, 255, 0.14) 0%, transparent 40%), linear-gradient(180deg, #07102f 0%, #0a1a4a 55%, #081332 100%);
 }
+#solution .solution__mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.35) 0%, #000 18%, #000 88%, rgba(0, 0, 0, 0.4) 100%);
+  mix-blend-mode: screen;
+}
+#solution .solution__mesh-canvas,
+#solution .polygon-mesh__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0.95;
+}
 #solution .solution__marquee {
   position: relative;
+  z-index: 1;
   width: 100%;
   overflow: hidden;
   padding: 28px 0 8px;
@@ -505,7 +522,7 @@ fieldset {
 }
 #solution .solution__inner {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 #solution .solution__title {
   margin: 24px 0 16px;
@@ -530,15 +547,18 @@ fieldset {
 #solution .solution__stage {
   position: relative;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  max-width: 1240px;
+  min-height: 720px;
+  margin: 0 auto;
   padding: 64px 0;
 }
 #solution .solution__visual {
+  position: absolute;
+  top: 50%;
+  left: 50%;
   z-index: 1;
-  width: min(78%, 1120px);
-  padding-bottom: 180px;
+  width: min(82%, 1120px);
+  transform: translate(-50%, -48%);
 }
 #solution .solution__visual img {
   display: block;
@@ -605,6 +625,7 @@ fieldset {
 #solution .solution__card-btn:hover {
   opacity: 0.88;
 }
+
 #news {
   position: relative;
   width: 100%;

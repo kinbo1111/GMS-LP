@@ -210,6 +210,13 @@
         }
     };
 
+    const initSolutionMesh = () => {
+        if (!window.PolygonMesh) {
+            return;
+        }
+        window.PolygonMesh.initAll('[data-polygon-mesh]');
+    };
+
     const initSolutionSection = () => {
         const section = document.querySelector('.solution');
         if (!section) {
@@ -333,6 +340,7 @@
 
     window.addEventListener('load', runIntroAnimation);
     window.addEventListener('load', initPerformanceSection);
+    window.addEventListener('load', initSolutionMesh);
     window.addEventListener('load', initSolutionSection);
     window.addEventListener('load', initAppScene);
 
