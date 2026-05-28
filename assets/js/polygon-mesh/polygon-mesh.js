@@ -51,7 +51,7 @@
             const oy = offset?.y ?? 0;
             const cos = Math.cos(rot);
             const sin = Math.sin(rot);
-            const tipCount = 5;
+            const tipCount = this.pattern.tipCount ?? 5;
 
             this.points = nodes.map(([nx, ny], index) => {
                 let x = (nx - ax) * sc + ax + ox;

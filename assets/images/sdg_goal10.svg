@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect width="100" height="100" fill="#DD1367"/>
+  <text x="8" y="26" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#fff">10</text>
+  <text x="8" y="40" font-family="Arial, sans-serif" font-size="8" font-weight="700" fill="#fff">REDUCED</text>
+  <text x="8" y="49" font-family="Arial, sans-serif" font-size="8" font-weight="700" fill="#fff">INEQUALITIES</text>
+  <g fill="#fff">
+    <path d="M58 50 l-8 6 8 6 v-4 h24 v-4 h-24 z"/>
+    <path d="M90 66 l8 6-8 6 v-4 H66 v-4 h24 z" transform="translate(-8,4)"/>
+    <rect x="56" y="74" width="34" height="3.5"/>
+    <rect x="56" y="80" width="34" height="3.5"/>
+  </g>
+</svg>
