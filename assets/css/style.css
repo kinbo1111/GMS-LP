@@ -786,6 +786,8 @@ fieldset {
 #platform .platform__marquee-track {
   display: flex;
   width: max-content;
+  animation: solution-marquee 55s linear infinite;
+  will-change: transform;
 }
 #platform .platform__marquee-track span {
   flex-shrink: 0;
@@ -956,6 +958,8 @@ fieldset {
 #sdg .sdg__marquee-track {
   display: flex;
   width: max-content;
+  animation: solution-marquee 90s linear infinite;
+  will-change: transform;
 }
 #sdg .sdg__marquee-track span {
   flex-shrink: 0;

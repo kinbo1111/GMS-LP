@@ -496,6 +496,8 @@
     .platform__marquee-track {
         display: flex;
         width: max-content;
+        animation: solution-marquee 55s linear infinite;
+        will-change: transform;
 
         span {
             flex-shrink: 0;
@@ -677,6 +679,8 @@
     .sdg__marquee-track {
         display: flex;
         width: max-content;
+        animation: solution-marquee 90s linear infinite;
+        will-change: transform;
 
         span {
             flex-shrink: 0;
