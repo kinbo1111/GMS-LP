@@ -2,8 +2,6 @@
     background: radial-gradient(ellipse 147% 100% at center, #003b79 0%, #000c63 100%);
 }
 
-// Full-screen white cover shown on load. It lifts away to reveal the
-// first-view, mirroring the hellomobility.jp opening transition.
 .fv-intro {
     position: fixed;
     inset: 0;
@@ -21,7 +19,6 @@
     }
 }
 
-// Lock page scrolling while the intro cover is on screen.
 body.is-intro {
     overflow: hidden;
 }

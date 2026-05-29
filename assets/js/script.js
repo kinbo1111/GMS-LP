@@ -10,9 +10,6 @@
         });
     };
 
-    // First-view intro modelled on hellomobility.jp: a full-screen white cover
-    // holds while the page loads (scroll locked), then lifts away as the hero
-    // settles from a slight zoom to its resting identity transform.
     const INTRO_MIN_DURATION = 600;
     const introStart = Date.now();
 
@@ -47,8 +44,6 @@
         const elapsed = Date.now() - introStart;
         const wait = Math.max(INTRO_MIN_DURATION - elapsed, 0);
 
-        // Hold the cover for a beat, then let the start frame paint so the CSS
-        // transitions fire on the reveal.
         window.setTimeout(() => {
             requestAnimationFrame(() => requestAnimationFrame(reveal));
         }, wait);
@@ -163,7 +158,6 @@
         const ctx = canvas.getContext('2d');
         const baseHue = 200;
 
-        // --- build a geodesic icosphere (icosahedron + 2 subdivisions) ---
         const phi = (1 + Math.sqrt(5)) / 2;
         let verts = [
             [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
@@ -230,7 +224,7 @@
         let W = 0;
         let H = 0;
         let R = 0;
-        const pivotLocal = 0; // spin around the vertical polar axis (through the centre)
+        const pivotLocal = 0;
         const tilt = -0.22;
         const persp = 3.6;
         const cosT = Math.cos(tilt);
@@ -258,10 +252,10 @@
             for (let i = 0; i < verts.length; i += 1) {
                 const v = verts[i];
                 const dx = v[0] - pivotLocal;
-                const rx = pivotLocal + dx * cosA + v[2] * sinA; // rotate about right-edge axis
+                const rx = pivotLocal + dx * cosA + v[2] * sinA;
                 const rz = -dx * sinA + v[2] * cosA;
                 const ry = v[1];
-                const y2 = ry * cosT - rz * sinT;                // slight tilt for depth
+                const y2 = ry * cosT - rz * sinT;
                 const z2 = ry * sinT + rz * cosT;
                 const factor = persp / (persp - z2);
                 projected[i] = {
@@ -336,9 +330,7 @@
             }
         };
 
-        // West-to-east spin: a steadily increasing angle drives the front
-        // surface left -> right, matching the real Earth's eastward rotation.
-        const speed = (Math.PI * 2) / 26000; // ~26s per full rotation
+        const speed = (Math.PI * 2) / 26000;
 
         if (reduceMotion) {
             project(0);
@@ -358,11 +350,7 @@
         requestAnimationFrame(frame);
     };
 
-    // Dotted-globe earth ported from the reference CodePen
-    // (https://codepen.io/Mattaniah-Tantero/pen/myrLaPm). Same dot-map build and
-    // sphere geometry, only the dot colour is changed to the brand blue so it
-    // sits inside the existing polygon wireframe ring.
-    const GLOBE_COLOR = 0x4db8ff; // brand blue (matches polygon-mesh hue ~200)
+    const GLOBE_COLOR = 0x4db8ff;
 
     const initPerformanceGlobe = () => {
         const container = document.querySelector('.performance__earth-globe');
@@ -373,8 +361,6 @@
         const THREE = window.THREE;
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-        // Pulled closer than the reference pen (z 22) so the globe fills more of
-        // the ring while staying just inside the surrounding polygon.
         camera.position.set(0, 0, 16);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
