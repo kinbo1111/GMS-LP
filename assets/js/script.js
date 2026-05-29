@@ -10,49 +10,12 @@
         });
     };
 
-    // Build a conical-helix path: counter-clockwise, starting at the cone
-    // apex (top-right, radius 0) and spiralling out to the base centred on
-    // the bottom-left. Because the base radius spans the full diagonal, the
-    // (thick-stroked) spiral sweeps across — and fully covers — the viewport.
-    // Also returns the cumulative arc length at each sample so the reveal can
-    // be paced evenly by the spiral parameter for a smooth leading edge.
-    const buildSpiralPath = (width, height, turns, baseRadius, tMax) => {
-        const startX = width; // top-right apex
-        const startY = 0;
-        const endX = 0;       // bottom-left base centre
-        const endY = height;
-        const steps = Math.max(720, Math.ceil(turns * 160));
-        const last = Math.round(steps * tMax);
-        const cumulative = new Array(last + 1);
-        let d = '';
-        let prevX = 0;
-        let prevY = 0;
-        let total = 0;
-
-        for (let index = 0; index <= last; index += 1) {
-            const t = index / steps;
-            const cx = startX + (endX - startX) * t;
-            const cy = startY + (endY - startY) * t;
-            const radius = baseRadius * t;            // 0 at apex → max at base
-            const angle = -2 * Math.PI * turns * t;   // counter-clockwise (y-down)
-            const x = cx + radius * Math.cos(angle);
-            const y = cy + radius * Math.sin(angle);
-
-            if (index === 0) {
-                d += `M${x.toFixed(2)} ${y.toFixed(2)} `;
-                cumulative[index] = 0;
-            } else {
-                d += `L${x.toFixed(2)} ${y.toFixed(2)} `;
-                total += Math.hypot(x - prevX, y - prevY);
-                cumulative[index] = total;
-            }
-
-            prevX = x;
-            prevY = y;
-        }
-
-        return { d: d.trim(), cumulative, total };
-    };
+    // Exact "Page Transition" Lottie data from https://codepen.io/HarryRay/pen/XgoWWg
+    // (Harry Ray, animated with bodymovin). Used UNCHANGED so it renders at the
+    // smoothness it was authored for. The pen plays it forwards to COVER the page
+    // (a swirl draws and a disc fills in); we play it in REVERSE so the same
+    // motion uncovers the page as the intro reveal.
+    const FV_INTRO_ANIMATION = {"v":"4.7.0","fr":30,"ip":0,"op":130,"w":1920,"h":1080,"nm":"Comp 1","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":4,"nm":"Shape Layer 2","ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},"p":{"a":0,"k":[960,540,0]},"a":{"a":0,"k":[0,0,0]},"s":{"a":1,"k":[{"i":{"x":[0.82,0.82,0.667],"y":[0.911,0.911,1]},"o":{"x":[0.724,0.724,0.333],"y":[0.008,0.008,0]},"n":["0p82_0p911_0p724_0p008","0p82_0p911_0p724_0p008","0p667_1_0p333_0"],"t":103,"s":[0,0,100],"e":[100,100,100]},{"t":122}]}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[681.12,0],[0,-681.12],[-681.12,0],[0,681.12]],"o":[[-681.12,0],[0,681.12],[681.12,0],[0,-681.12]],"v":[[0,-1233.277],[-1233.277,0],[0,1233.277],[1233.277,0]],"c":true}},"nm":"Path 1","mn":"ADBE Vector Shape - Group"},{"ty":"fl","c":{"a":0,"k":[1,1,1,1]},"o":{"a":0,"k":100},"r":1,"nm":"Fill 1","mn":"ADBE Vector Graphic - Fill"},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[119.22,119.22],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Ellipse 1","np":3,"cix":2,"ix":1,"mn":"ADBE Vector Group"}],"ip":0,"op":300,"st":0,"bm":0,"sr":1},{"ddd":0,"ind":2,"ty":4,"nm":"Shape Layer 1","ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},"p":{"a":0,"k":[960,504,0]},"a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[358.327,0],[0,-358.327],[-358.327,0],[0,358.327]],"o":[[-358.327,0],[0,358.327],[358.327,0],[0,-358.327]],"v":[[-40,-808.809],[-688.809,-160],[-40,488.809],[608.809,-160]],"c":true}},"nm":"Path 1","mn":"ADBE Vector Shape - Group"},{"ty":"tm","s":{"a":0,"k":0,"ix":1},"e":{"a":1,"k":[{"i":{"x":[0.667],"y":[1]},"o":{"x":[0.333],"y":[0]},"n":["0p667_1_0p333_0"],"t":18,"s":[0],"e":[100]},{"t":113}],"ix":2},"o":{"a":0,"k":0,"ix":3},"m":1,"ix":2,"nm":"Trim Paths 1","mn":"ADBE Vector Filter - Trim"},{"ty":"st","c":{"a":0,"k":[1,1,1,1]},"o":{"a":0,"k":100},"w":{"a":1,"k":[{"i":{"x":[0.667],"y":[1]},"o":{"x":[0.333],"y":[0]},"n":["0p667_1_0p333_0"],"t":20,"s":[333],"e":[1000]},{"t":120}]},"lc":2,"lj":1,"ml":4,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke"},{"ty":"tr","p":{"a":0,"k":[42.402,283.387],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":1,"k":[{"i":{"x":[0.667,0.667],"y":[1,1]},"o":{"x":[0.333,0.333],"y":[0,0]},"n":["0p667_1_0p333_0","0p667_1_0p333_0"],"t":19,"s":[0,0],"e":[150.901,150.901]},{"t":117}],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Ellipse 1","np":4,"cix":2,"ix":1,"mn":"ADBE Vector Group"}],"ip":0,"op":300,"st":0,"bm":0,"sr":1}]};
 
     const runFirstViewReveal = () => {
         const introEl = document.getElementById('fv-intro');
@@ -61,86 +24,47 @@
             return;
         }
 
+        let settled = false;
         const finish = () => {
+            if (settled) {
+                return;
+            }
+            settled = true;
             introEl.classList.add('is-done');
             revealContent();
             window.setTimeout(() => introEl.remove(), 600);
         };
 
-        if (reduceMotion) {
+        const lottie = window.lottie || window.bodymovin;
+        if (reduceMotion || !lottie) {
             finish();
             return;
         }
 
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        const turns = 9;
-        const diagonal = Math.hypot(width, height);
-        const baseRadius = diagonal * 1.12;
-        // Stroke covers both the radial growth and the centre's travel per
-        // turn, so consecutive coils overlap and leave no gaps.
-        const strokeWidth = ((baseRadius + diagonal) / turns) * 1.18;
-        // Stop right where coverage completes (the bottom-left corner clears
-        // last) so the timeline isn't padded with an invisible tail.
-        const tMax = 0.47;
-        const { d: path, cumulative, total } = buildSpiralPath(width, height, turns, baseRadius, tMax);
-        const region = `x="${-2 * width}" y="${-2 * height}" width="${5 * width}" height="${5 * height}"`;
+        introEl.innerHTML = '';
+        const anim = lottie.loadAnimation({
+            container: introEl,
+            renderer: 'svg',
+            loop: false,
+            autoplay: false,
+            animationData: FV_INTRO_ANIMATION,
+            // The comp is 1920x1080; 'slice' scales it to fully cover any viewport.
+            rendererSettings: { preserveAspectRatio: 'xMidYMid slice' }
+        });
 
-        introEl.style.background = 'transparent';
-        introEl.innerHTML = `
-            <svg class="fv-intro__svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <mask id="fvRevealMask" maskUnits="userSpaceOnUse" ${region}>
-                        <rect width="${width}" height="${height}" fill="#ffffff"></rect>
-                        <path class="fv-intro__spiral" d="${path}" fill="none" stroke="#000000" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"></path>
-                    </mask>
-                </defs>
-                <rect width="${width}" height="${height}" fill="#ffffff" mask="url(#fvRevealMask)"></rect>
-            </svg>`;
+        anim.addEventListener('DOMLoaded', () => {
+            // Jump to the last frame (page fully covered), then play backwards so
+            // the swirl + disc retract and uncover the page.
+            const lastFrame = Math.max(0, Math.floor(anim.getDuration(true)) - 1);
+            anim.goToAndStop(lastFrame, true);
+            introEl.style.background = 'transparent';
+            anim.setDirection(-1);
+            anim.play();
+        });
+        anim.addEventListener('complete', finish);
 
-        const spiral = introEl.querySelector('.fv-intro__spiral');
-        if (!spiral) {
-            finish();
-            return;
-        }
-
-        const segments = cumulative.length - 1;
-        spiral.style.strokeDasharray = `${total}`;
-        spiral.style.strokeDashoffset = `${total}`;
-
-        const duration = 2500;
-        // Gentle symmetric ease (sine) for a soft start and a soft landing.
-        const easeInOutSine = (p) => -(Math.cos(Math.PI * p) - 1) / 2;
-        const fadeStart = 0.86; // dissolve the final sliver to avoid a hard stop
-        let startTime = null;
-
-        const step = (now) => {
-            if (startTime === null) {
-                startTime = now;
-            }
-            const progress = Math.min((now - startTime) / duration, 1);
-            const eased = easeInOutSine(progress);
-
-            // Pace by spiral parameter (even leading-edge motion), mapping the
-            // eased progress through the arc-length table.
-            const pointer = eased * segments;
-            const lower = Math.min(Math.floor(pointer), segments - 1);
-            const frac = pointer - lower;
-            const drawn = cumulative[lower] + (cumulative[lower + 1] - cumulative[lower]) * frac;
-            spiral.style.strokeDashoffset = `${total - drawn}`;
-
-            if (progress > fadeStart) {
-                introEl.style.opacity = `${Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart))}`;
-            }
-
-            if (progress < 1) {
-                requestAnimationFrame(step);
-            } else {
-                finish();
-            }
-        };
-
-        requestAnimationFrame(step);
+        // Safety net in case Lottie never fires its events.
+        window.setTimeout(finish, 4000);
     };
 
     const initPerformanceSection = () => {
