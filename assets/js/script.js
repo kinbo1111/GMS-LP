@@ -10,62 +10,46 @@
         });
     };
 
-    // Exact "Page Transition" Lottie data from https://codepen.io/HarryRay/pen/XgoWWg
-    // (Harry Ray, animated with bodymovin). Used UNCHANGED so it renders at the
-    // smoothness it was authored for. The pen plays it forwards to COVER the page
-    // (a swirl draws and a disc fills in); we play it in REVERSE so the same
-    // motion uncovers the page as the intro reveal.
-    const FV_INTRO_ANIMATION = {"v":"4.7.0","fr":30,"ip":0,"op":130,"w":1920,"h":1080,"nm":"Comp 1","ddd":0,"assets":[],"layers":[{"ddd":0,"ind":1,"ty":4,"nm":"Shape Layer 2","ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},"p":{"a":0,"k":[960,540,0]},"a":{"a":0,"k":[0,0,0]},"s":{"a":1,"k":[{"i":{"x":[0.82,0.82,0.667],"y":[0.911,0.911,1]},"o":{"x":[0.724,0.724,0.333],"y":[0.008,0.008,0]},"n":["0p82_0p911_0p724_0p008","0p82_0p911_0p724_0p008","0p667_1_0p333_0"],"t":103,"s":[0,0,100],"e":[100,100,100]},{"t":122}]}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[681.12,0],[0,-681.12],[-681.12,0],[0,681.12]],"o":[[-681.12,0],[0,681.12],[681.12,0],[0,-681.12]],"v":[[0,-1233.277],[-1233.277,0],[0,1233.277],[1233.277,0]],"c":true}},"nm":"Path 1","mn":"ADBE Vector Shape - Group"},{"ty":"fl","c":{"a":0,"k":[1,1,1,1]},"o":{"a":0,"k":100},"r":1,"nm":"Fill 1","mn":"ADBE Vector Graphic - Fill"},{"ty":"tr","p":{"a":0,"k":[0,0],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":0,"k":[119.22,119.22],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Ellipse 1","np":3,"cix":2,"ix":1,"mn":"ADBE Vector Group"}],"ip":0,"op":300,"st":0,"bm":0,"sr":1},{"ddd":0,"ind":2,"ty":4,"nm":"Shape Layer 1","ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},"p":{"a":0,"k":[960,504,0]},"a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},"ao":0,"shapes":[{"ty":"gr","it":[{"ind":0,"ty":"sh","ix":1,"ks":{"a":0,"k":{"i":[[358.327,0],[0,-358.327],[-358.327,0],[0,358.327]],"o":[[-358.327,0],[0,358.327],[358.327,0],[0,-358.327]],"v":[[-40,-808.809],[-688.809,-160],[-40,488.809],[608.809,-160]],"c":true}},"nm":"Path 1","mn":"ADBE Vector Shape - Group"},{"ty":"tm","s":{"a":0,"k":0,"ix":1},"e":{"a":1,"k":[{"i":{"x":[0.667],"y":[1]},"o":{"x":[0.333],"y":[0]},"n":["0p667_1_0p333_0"],"t":18,"s":[0],"e":[100]},{"t":113}],"ix":2},"o":{"a":0,"k":0,"ix":3},"m":1,"ix":2,"nm":"Trim Paths 1","mn":"ADBE Vector Filter - Trim"},{"ty":"st","c":{"a":0,"k":[1,1,1,1]},"o":{"a":0,"k":100},"w":{"a":1,"k":[{"i":{"x":[0.667],"y":[1]},"o":{"x":[0.333],"y":[0]},"n":["0p667_1_0p333_0"],"t":20,"s":[333],"e":[1000]},{"t":120}]},"lc":2,"lj":1,"ml":4,"nm":"Stroke 1","mn":"ADBE Vector Graphic - Stroke"},{"ty":"tr","p":{"a":0,"k":[42.402,283.387],"ix":2},"a":{"a":0,"k":[0,0],"ix":1},"s":{"a":1,"k":[{"i":{"x":[0.667,0.667],"y":[1,1]},"o":{"x":[0.333,0.333],"y":[0,0]},"n":["0p667_1_0p333_0","0p667_1_0p333_0"],"t":19,"s":[0,0],"e":[150.901,150.901]},{"t":117}],"ix":3},"r":{"a":0,"k":0,"ix":6},"o":{"a":0,"k":100,"ix":7},"sk":{"a":0,"k":0,"ix":4},"sa":{"a":0,"k":0,"ix":5},"nm":"Transform"}],"nm":"Ellipse 1","np":4,"cix":2,"ix":1,"mn":"ADBE Vector Group"}],"ip":0,"op":300,"st":0,"bm":0,"sr":1}]};
+    const INTRO_MIN_DURATION = 600;
+    const introStart = Date.now();
+
+    const lockIntroScroll = () => {
+        if (document.body) {
+            document.body.classList.add('is-intro');
+        }
+    };
 
     const runFirstViewReveal = () => {
-        const introEl = document.getElementById('fv-intro');
-        if (!introEl) {
-            revealContent();
-            return;
-        }
+        const firstView = document.getElementById('first-view');
+        const intro = document.getElementById('fv-intro');
 
-        let settled = false;
-        const finish = () => {
-            if (settled) {
-                return;
+        const reveal = () => {
+            if (firstView) {
+                firstView.classList.add('is-revealed');
             }
-            settled = true;
-            introEl.classList.add('is-done');
+            if (intro) {
+                intro.classList.add('is-hidden');
+            }
+            if (document.body) {
+                document.body.classList.remove('is-intro');
+            }
             revealContent();
-            window.setTimeout(() => introEl.remove(), 600);
         };
 
-        const lottie = window.lottie || window.bodymovin;
-        if (reduceMotion || !lottie) {
-            finish();
+        if (reduceMotion || !firstView) {
+            reveal();
             return;
         }
 
-        introEl.innerHTML = '';
-        const anim = lottie.loadAnimation({
-            container: introEl,
-            renderer: 'svg',
-            loop: false,
-            autoplay: false,
-            animationData: FV_INTRO_ANIMATION,
-            // The comp is 1920x1080; 'slice' scales it to fully cover any viewport.
-            rendererSettings: { preserveAspectRatio: 'xMidYMid slice' }
-        });
+        const elapsed = Date.now() - introStart;
+        const wait = Math.max(INTRO_MIN_DURATION - elapsed, 0);
 
-        anim.addEventListener('DOMLoaded', () => {
-            // Jump to the last frame (page fully covered), then play backwards so
-            // the swirl + disc retract and uncover the page.
-            const lastFrame = Math.max(0, Math.floor(anim.getDuration(true)) - 1);
-            anim.goToAndStop(lastFrame, true);
-            introEl.style.background = 'transparent';
-            anim.setDirection(-1);
-            anim.play();
-        });
-        anim.addEventListener('complete', finish);
-
-        // Safety net in case Lottie never fires its events.
-        window.setTimeout(finish, 4000);
+        window.setTimeout(() => {
+            requestAnimationFrame(() => requestAnimationFrame(reveal));
+        }, wait);
     };
+
+    lockIntroScroll();
 
     const initPerformanceSection = () => {
         const section = document.querySelector('.performance');
@@ -174,7 +158,6 @@
         const ctx = canvas.getContext('2d');
         const baseHue = 200;
 
-        // --- build a geodesic icosphere (icosahedron + 2 subdivisions) ---
         const phi = (1 + Math.sqrt(5)) / 2;
         let verts = [
             [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
@@ -241,7 +224,7 @@
         let W = 0;
         let H = 0;
         let R = 0;
-        const pivotLocal = 0; // spin around the vertical polar axis (through the centre)
+        const pivotLocal = 0;
         const tilt = -0.22;
         const persp = 3.6;
         const cosT = Math.cos(tilt);
@@ -269,10 +252,10 @@
             for (let i = 0; i < verts.length; i += 1) {
                 const v = verts[i];
                 const dx = v[0] - pivotLocal;
-                const rx = pivotLocal + dx * cosA + v[2] * sinA; // rotate about right-edge axis
+                const rx = pivotLocal + dx * cosA + v[2] * sinA;
                 const rz = -dx * sinA + v[2] * cosA;
                 const ry = v[1];
-                const y2 = ry * cosT - rz * sinT;                // slight tilt for depth
+                const y2 = ry * cosT - rz * sinT;
                 const z2 = ry * sinT + rz * cosT;
                 const factor = persp / (persp - z2);
                 projected[i] = {
@@ -347,9 +330,7 @@
             }
         };
 
-        // West-to-east spin: a steadily increasing angle drives the front
-        // surface left -> right, matching the real Earth's eastward rotation.
-        const speed = (Math.PI * 2) / 26000; // ~26s per full rotation
+        const speed = (Math.PI * 2) / 26000;
 
         if (reduceMotion) {
             project(0);
@@ -367,6 +348,104 @@
             requestAnimationFrame(frame);
         };
         requestAnimationFrame(frame);
+    };
+
+    const GLOBE_COLOR = 0x4db8ff;
+
+    const initPerformanceGlobe = () => {
+        const container = document.querySelector('.performance__earth-globe');
+        if (!container || !window.THREE) {
+            return;
+        }
+
+        const THREE = window.THREE;
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        camera.position.set(0, 0, 16);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        container.appendChild(renderer.domElement);
+
+        let particles = null;
+
+        const sizeRenderer = () => {
+            const size = Math.max(container.clientWidth, 1);
+            renderer.setSize(size, size, false);
+            camera.aspect = 1;
+            camera.updateProjectionMatrix();
+        };
+        sizeRenderer();
+        window.addEventListener('resize', sizeRenderer);
+
+        const buildDottedMap = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 1024;
+            canvas.height = 512;
+
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.src = 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg';
+
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, 1024, 512);
+                const data = ctx.getImageData(0, 0, 1024, 512).data;
+                const positions = [];
+
+                for (let y = 0; y < 512; y += 3) {
+                    for (let x = 0; x < 1024; x += 3) {
+                        const i = (y * 1024 + x) * 4;
+                        if (data[i] > 65) {
+                            const lat = (y / 512) * Math.PI - Math.PI / 2;
+                            const lon = (x / 1024) * 2 * Math.PI - Math.PI;
+                            const r = 8.5;
+                            positions.push(
+                                -r * Math.cos(lat) * Math.cos(lon),
+                                -r * Math.sin(lat),
+                                r * Math.cos(lat) * Math.sin(lon)
+                            );
+                        }
+                    }
+                }
+
+                const geom = new THREE.BufferGeometry();
+                geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+                const mat = new THREE.PointsMaterial({
+                    color: GLOBE_COLOR,
+                    size: 0.08,
+                    transparent: true,
+                    opacity: 0.6
+                });
+                particles = new THREE.Points(geom, mat);
+                scene.add(particles);
+            };
+        };
+
+        const render = () => {
+            renderer.render(scene, camera);
+        };
+
+        if (reduceMotion) {
+            buildDottedMap();
+            const settle = window.setInterval(() => {
+                if (particles) {
+                    render();
+                    window.clearInterval(settle);
+                }
+            }, 80);
+            return;
+        }
+
+        buildDottedMap();
+        const animate = () => {
+            requestAnimationFrame(animate);
+            if (particles) {
+                particles.rotation.y += 0.001;
+            }
+            render();
+        };
+        animate();
     };
 
     const initSolutionMesh = () => {
@@ -545,13 +624,14 @@
 
     window.addEventListener('DOMContentLoaded', initHeaderMenu);
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', runFirstViewReveal);
-    } else {
+    if (document.readyState === 'complete') {
         runFirstViewReveal();
+    } else {
+        window.addEventListener('load', runFirstViewReveal);
     }
     window.addEventListener('load', initPerformanceSection);
     window.addEventListener('load', initPerformanceEarth);
+    window.addEventListener('load', initPerformanceGlobe);
     window.addEventListener('load', initSolutionMesh);
     window.addEventListener('load', initSolutionSection);
     window.addEventListener('load', initAppScene);

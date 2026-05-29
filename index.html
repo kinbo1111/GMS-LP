@@ -9,7 +9,6 @@
 </head>
 
 <body>
-    <div id="fv-intro" class="fv-intro" aria-hidden="true"></div>
     <header id="header" class="header">
         <div class="header__inner container">
             <div class="header__logo">
@@ -40,6 +39,7 @@
         <div class="header__overlay" aria-hidden="true"></div>
     </header>
     <main>
+        <div id="fv-intro" class="fv-intro" aria-hidden="true"></div>
         <section class="gradient-bg">
 
             <section id="first-view" class="first-view">
@@ -64,7 +64,7 @@
             </section>
             <section id="performance" class="performance">
                 <div class="performance__earth" aria-hidden="true">
-                    <img class="performance__earth-globe" src="assets/images/earth.svg" alt="">
+                    <div class="performance__earth-globe"></div>
                     <canvas class="performance__earth-mesh"></canvas>
                 </div>
                 <div class="performance__inner container">
@@ -384,7 +384,7 @@
     <footer>
 
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
     <script src="assets/js/polygon-mesh/patterns.js"></script>
