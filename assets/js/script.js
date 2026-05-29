@@ -350,6 +350,197 @@
         requestAnimationFrame(frame);
     };
 
+    const initPerformanceNebula = () => {
+        const canvas = document.querySelector('.performance__nebula');
+        if (!canvas) {
+            return;
+        }
+        const ctx = canvas.getContext('2d');
+
+        const palette = {
+            blue: [100, 150, 255],
+            cyan: [50, 200, 230],
+            soft: [150, 180, 255]
+        };
+
+        const coreSeeds = [
+            { x: 0.13, y: 0.22, scale: 1.0, color: palette.cyan },
+            { x: 0.16, y: 0.76, scale: 0.9, color: palette.blue },
+            { x: 0.84, y: 0.2, scale: 1.05, color: palette.cyan },
+            { x: 0.86, y: 0.78, scale: 0.95, color: palette.blue }
+        ];
+
+        const GLOW_COUNT = 26;
+        const PARTICLE_COUNT = 70;
+        const CONNECT = 150;
+
+        let W = 0;
+        let H = 0;
+        const cores = [];
+        const glows = [];
+        const particles = [];
+
+        const rgba = (c, a) => `rgba(${c[0]}, ${c[1]}, ${c[2]}, ${a})`;
+
+        const seed = () => {
+            cores.length = 0;
+            coreSeeds.forEach((s) => {
+                cores.push({
+                    bx: s.x,
+                    by: s.y,
+                    color: s.color,
+                    scale: s.scale,
+                    phase: Math.random() * Math.PI * 2,
+                    driftX: 0.02 + Math.random() * 0.03,
+                    driftY: 0.02 + Math.random() * 0.03
+                });
+            });
+
+            glows.length = 0;
+            for (let i = 0; i < GLOW_COUNT; i += 1) {
+                glows.push({
+                    x: Math.random(),
+                    y: Math.random(),
+                    base: 2 + Math.random() * 6,
+                    phase: Math.random() * Math.PI * 2,
+                    pulse: Math.random() * Math.PI * 2
+                });
+            }
+
+            particles.length = 0;
+            for (let i = 0; i < PARTICLE_COUNT; i += 1) {
+                particles.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2,
+                    size: 1.8 + Math.random() * 2.2,
+                    phase: Math.random() * Math.PI * 2,
+                    conn: 0
+                });
+            }
+        };
+
+        const resize = () => {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            W = canvas.clientWidth;
+            H = canvas.clientHeight;
+            canvas.width = Math.round(W * dpr);
+            canvas.height = Math.round(H * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            seed();
+        };
+        resize();
+        window.addEventListener('resize', resize);
+
+        const drawCores = (time) => {
+            ctx.globalCompositeOperation = 'lighter';
+            cores.forEach((core) => {
+                const ph = time * 0.00008 + core.phase;
+                const x = (core.bx + Math.sin(ph) * core.driftX) * W;
+                const y = (core.by + Math.cos(ph * 1.3) * core.driftY) * H;
+                const r = W * 0.3 * core.scale * (0.92 + 0.08 * Math.sin(ph * 0.7));
+                const a = 0.2 + 0.06 * Math.sin(time * 0.0004 + core.phase);
+                const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+                g.addColorStop(0, rgba(core.color, a));
+                g.addColorStop(0.45, rgba(core.color, a * 0.45));
+                g.addColorStop(1, rgba(core.color, 0));
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        };
+
+        const drawGlows = (time) => {
+            ctx.globalCompositeOperation = 'lighter';
+            glows.forEach((p) => {
+                const ph = time * 0.0002 + p.phase;
+                const x = (((p.x + Math.sin(ph * 0.5) * 0.04) % 1) + 1) % 1 * W;
+                const y = (((p.y + Math.cos(ph * 0.7) * 0.03) % 1) + 1) % 1 * H;
+                const pulse = 0.7 + 0.3 * Math.sin(time * 0.0005 + p.pulse);
+                const size = p.base * pulse * 2.4;
+                const g = ctx.createRadialGradient(x, y, 0, x, y, size);
+                g.addColorStop(0, rgba(palette.soft, 0.5));
+                g.addColorStop(0.4, rgba(palette.blue, 0.16));
+                g.addColorStop(1, rgba(palette.blue, 0));
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        };
+
+        const drawParticles = (time) => {
+            particles.forEach((p) => {
+                const tt = time * 0.00003 + p.phase;
+                const fx = Math.sin(p.x * 0.005 + tt) * 0.2;
+                const fy = Math.cos(p.y * 0.005 + tt * 1.3) * 0.2;
+                p.vx = p.vx * 0.95 + fx * 0.05 + (Math.random() - 0.5) * 0.02;
+                p.vy = p.vy * 0.95 + fy * 0.05 + (Math.random() - 0.5) * 0.02;
+                const sp = Math.hypot(p.vx, p.vy);
+                if (sp > 0.5) {
+                    p.vx = (p.vx / sp) * 0.5;
+                    p.vy = (p.vy / sp) * 0.5;
+                }
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = W;
+                if (p.x > W) p.x = 0;
+                if (p.y < 0) p.y = H;
+                if (p.y > H) p.y = 0;
+                p.conn = 0;
+            });
+
+            ctx.globalCompositeOperation = 'lighter';
+            for (let i = 0; i < particles.length; i += 1) {
+                const p1 = particles[i];
+                const v = Math.hypot(p1.vx, p1.vy);
+                ctx.beginPath();
+                ctx.arc(p1.x, p1.y, p1.size, 0, Math.PI * 2);
+                ctx.fillStyle = rgba(palette.soft, 0.45 + v * 0.6);
+                ctx.fill();
+                for (let j = i + 1; j < particles.length; j += 1) {
+                    const p2 = particles[j];
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const d = Math.hypot(dx, dy);
+                    if (d < CONNECT && p1.conn < 5 && p2.conn < 5) {
+                        const s = 1 - d / CONNECT;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.lineWidth = 1 + s * 1.6;
+                        ctx.strokeStyle = rgba(palette.soft, 0.12 + s * 0.24);
+                        ctx.stroke();
+                        p1.conn += 1;
+                        p2.conn += 1;
+                    }
+                }
+            }
+        };
+
+        const renderFrame = (time) => {
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.clearRect(0, 0, W, H);
+            drawCores(time);
+            drawGlows(time);
+            drawParticles(time);
+            ctx.globalCompositeOperation = 'source-over';
+        };
+
+        if (reduceMotion) {
+            renderFrame(0);
+            return;
+        }
+
+        const frame = (now) => {
+            renderFrame(now);
+            requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+    };
+
     const GLOBE_COLOR = 0x4db8ff;
 
     const initPerformanceGlobe = () => {
@@ -630,6 +821,7 @@
         window.addEventListener('load', runFirstViewReveal);
     }
     window.addEventListener('load', initPerformanceSection);
+    window.addEventListener('load', initPerformanceNebula);
     window.addEventListener('load', initPerformanceEarth);
     window.addEventListener('load', initPerformanceGlobe);
     window.addEventListener('load', initSolutionMesh);
