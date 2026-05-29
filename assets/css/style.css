@@ -1,4 +1,3 @@
-@charset "UTF-8";
 *,
 *::before,
 *::after {
@@ -317,8 +316,10 @@ fieldset {
   justify-content: center;
 }
 
-/* First-view intro: white cover wiped away by a counter-clockwise
-   conical spiral (top-right apex → bottom-left). */
+.gradient-bg {
+  background: radial-gradient(ellipse 147% 100% at center, #003b79 0%, #000c63 100%);
+}
+
 .fv-intro {
   position: fixed;
   inset: 0;
@@ -350,10 +351,6 @@ fieldset {
   position: relative;
   width: 100%;
   height: 100vh;
-  background: linear-gradient(-86.2766deg, #003b79 0%, #000c63 100%);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
 }
 #first-view::after {
   content: "";
@@ -498,7 +495,6 @@ fieldset {
   position: relative;
   width: 100%;
   height: 100vh;
-  background: linear-gradient(-86.2766deg, #003b79 0%, #000c63 100%);
   overflow: hidden;
 }
 #performance .performance__earth {
@@ -603,7 +599,6 @@ fieldset {
   width: 100%;
   overflow: hidden;
   padding: 0 0 120px;
-  background: radial-gradient(circle at 20% 30%, rgba(74, 118, 255, 0.18) 0%, transparent 45%), radial-gradient(circle at 80% 70%, rgba(120, 86, 255, 0.14) 0%, transparent 40%), linear-gradient(180deg, #07102f 0%, #0a1a4a 55%, #081332 100%);
 }
 #solution .solution__mesh {
   position: absolute;
@@ -757,7 +752,6 @@ fieldset {
   width: 100%;
   overflow: hidden;
   padding: 0 0 160px;
-  background: radial-gradient(circle at 72% 26%, rgba(96, 74, 198, 0.2) 0%, transparent 46%), radial-gradient(circle at 12% 70%, rgba(58, 92, 200, 0.16) 0%, transparent 45%), linear-gradient(180deg, #0a1340 0%, #0b1248 48%, #090f3a 100%);
 }
 #platform .platform__mesh {
   position: absolute;
@@ -941,7 +935,6 @@ fieldset {
   width: 100%;
   overflow: hidden;
   padding: 0 0 140px;
-  background: radial-gradient(circle at 18% 18%, rgba(74, 118, 255, 0.16) 0%, transparent 45%), linear-gradient(180deg, #0a1a54 0%, #081544 55%, #060f38 100%);
 }
 #sdg .sdg__marquee {
   position: absolute;
