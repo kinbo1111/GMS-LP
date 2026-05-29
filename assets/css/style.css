@@ -539,6 +539,8 @@ body.is-intro {
   height: 100%;
   z-index: 0;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
 }
 #performance .performance__earth {
   position: absolute;
@@ -660,6 +662,8 @@ body.is-intro {
   height: 100%;
   z-index: 0;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
 }
 #solution .solution__marquee {
   position: relative;
@@ -807,6 +811,8 @@ body.is-intro {
   height: 100%;
   z-index: 0;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 86%, transparent 100%);
 }
 #platform .platform__marquee {
   position: absolute;
