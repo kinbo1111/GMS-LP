@@ -44,6 +44,8 @@
         background-position: center;
         background-repeat: no-repeat;
         opacity: 0.5;
+        -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 90%);
+        mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 90%);
     }
     .first-view__inner {
         position: relative;
