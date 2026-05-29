@@ -170,8 +170,38 @@
     width: 100%;
     height: 100vh;
     background: linear-gradient(-86.2766deg, #003b79 0%, #000c63 100%);
+    overflow: hidden;
+
+    .performance__earth {
+        position: absolute;
+        top: 50%;
+        right: -7%;
+        transform: translateY(-50%);
+        width: min(900px, 66vw);
+        aspect-ratio: 1 / 1;
+        z-index: 1;
+        pointer-events: none;
+        perspective: 2000px;
+
+        .performance__earth-globe {
+            position: absolute;
+            inset: 8%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .performance__earth-mesh {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
+    }
+
     .performance__inner {
         position: relative;
+        z-index: 2;
         height: 100vh;
         width: 100%;
         display: flex;

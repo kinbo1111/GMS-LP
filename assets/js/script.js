@@ -241,6 +241,210 @@
         }
     };
 
+    const initPerformanceEarth = () => {
+        const canvas = document.querySelector('.performance__earth-mesh');
+        if (!canvas) {
+            return;
+        }
+
+        const ctx = canvas.getContext('2d');
+        const baseHue = 200;
+
+        // --- build a geodesic icosphere (icosahedron + 2 subdivisions) ---
+        const phi = (1 + Math.sqrt(5)) / 2;
+        let verts = [
+            [-1, phi, 0], [1, phi, 0], [-1, -phi, 0], [1, -phi, 0],
+            [0, -1, phi], [0, 1, phi], [0, -1, -phi], [0, 1, -phi],
+            [phi, 0, -1], [phi, 0, 1], [-phi, 0, -1], [-phi, 0, 1]
+        ].map((v) => {
+            const l = Math.hypot(v[0], v[1], v[2]);
+            return [v[0] / l, v[1] / l, v[2] / l];
+        });
+        let faces = [
+            [0, 11, 5], [0, 5, 1], [0, 1, 7], [0, 7, 10], [0, 10, 11],
+            [1, 5, 9], [5, 11, 4], [11, 10, 2], [10, 7, 6], [7, 1, 8],
+            [3, 9, 4], [3, 4, 2], [3, 2, 6], [3, 6, 8], [3, 8, 9],
+            [4, 9, 5], [2, 4, 11], [6, 2, 10], [8, 6, 7], [9, 8, 1]
+        ];
+
+        const subdivide = () => {
+            const cache = {};
+            const next = [];
+            const midpoint = (a, b) => {
+                const key = a < b ? `${a}_${b}` : `${b}_${a}`;
+                if (cache[key] !== undefined) {
+                    return cache[key];
+                }
+                const va = verts[a];
+                const vb = verts[b];
+                const m = [(va[0] + vb[0]) / 2, (va[1] + vb[1]) / 2, (va[2] + vb[2]) / 2];
+                const l = Math.hypot(m[0], m[1], m[2]);
+                verts.push([m[0] / l, m[1] / l, m[2] / l]);
+                cache[key] = verts.length - 1;
+                return cache[key];
+            };
+            faces.forEach(([a, b, c]) => {
+                const ab = midpoint(a, b);
+                const bc = midpoint(b, c);
+                const ca = midpoint(c, a);
+                next.push([a, ab, ca], [b, bc, ab], [c, ca, bc], [ab, bc, ca]);
+            });
+            faces = next;
+        };
+        subdivide();
+        subdivide();
+
+        const edgeSeen = new Set();
+        const edges = [];
+        faces.forEach(([a, b, c]) => {
+            [[a, b], [b, c], [c, a]].forEach(([x, y]) => {
+                const key = x < y ? `${x}_${y}` : `${y}_${x}`;
+                if (!edgeSeen.has(key)) {
+                    edgeSeen.add(key);
+                    edges.push([x, y]);
+                }
+            });
+        });
+
+        const nodeStyle = verts.map(() => {
+            const r = Math.random();
+            return {
+                type: r > 0.9 ? 1 : (r < 0.22 ? 2 : 0),
+                hue: baseHue + Math.random() * 30
+            };
+        });
+
+        let W = 0;
+        let H = 0;
+        let R = 0;
+        const pivotLocal = 0; // spin around the vertical polar axis (through the centre)
+        const tilt = -0.22;
+        const persp = 3.6;
+        const cosT = Math.cos(tilt);
+        const sinT = Math.sin(tilt);
+
+        const resize = () => {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            W = canvas.clientWidth;
+            H = canvas.clientHeight;
+            canvas.width = Math.round(W * dpr);
+            canvas.height = Math.round(H * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            R = Math.min(W, H) * 0.46;
+        };
+        resize();
+        window.addEventListener('resize', resize);
+
+        const projected = new Array(verts.length);
+
+        const project = (angle) => {
+            const cosA = Math.cos(angle);
+            const sinA = Math.sin(angle);
+            const cx = W / 2;
+            const cy = H / 2;
+            for (let i = 0; i < verts.length; i += 1) {
+                const v = verts[i];
+                const dx = v[0] - pivotLocal;
+                const rx = pivotLocal + dx * cosA + v[2] * sinA; // rotate about right-edge axis
+                const rz = -dx * sinA + v[2] * cosA;
+                const ry = v[1];
+                const y2 = ry * cosT - rz * sinT;                // slight tilt for depth
+                const z2 = ry * sinT + rz * cosT;
+                const factor = persp / (persp - z2);
+                projected[i] = {
+                    x: cx + rx * R * factor,
+                    y: cy + y2 * R * factor,
+                    z: z2,
+                    s: factor
+                };
+            }
+        };
+
+        const draw = () => {
+            ctx.clearRect(0, 0, W, H);
+
+            faces.forEach(([a, b, c]) => {
+                const pa = projected[a];
+                const pb = projected[b];
+                const pc = projected[c];
+                const avgZ = (pa.z + pb.z + pc.z) / 3;
+                const light = 0.03 + ((avgZ + 1) / 2) * 0.1;
+                ctx.beginPath();
+                ctx.moveTo(pa.x, pa.y);
+                ctx.lineTo(pb.x, pb.y);
+                ctx.lineTo(pc.x, pc.y);
+                ctx.closePath();
+                ctx.fillStyle = `hsla(${baseHue + 8}, 80%, 55%, ${Math.min(0.14, light)})`;
+                ctx.fill();
+            });
+
+            edges.forEach(([a, b]) => {
+                const pa = projected[a];
+                const pb = projected[b];
+                const avgZ = (pa.z + pb.z) / 2;
+                const front = (avgZ + 1) / 2;
+                if (avgZ >= 0) {
+                    ctx.strokeStyle = `hsla(${baseHue}, 92%, 70%, ${0.18 + front * 0.5})`;
+                    ctx.lineWidth = 1.1;
+                } else {
+                    ctx.strokeStyle = `hsla(${baseHue + 30}, 35%, 88%, ${0.06 + front * 0.16})`;
+                    ctx.lineWidth = 0.8;
+                }
+                ctx.beginPath();
+                ctx.moveTo(pa.x, pa.y);
+                ctx.lineTo(pb.x, pb.y);
+                ctx.stroke();
+            });
+
+            for (let i = 0; i < projected.length; i += 1) {
+                const p = projected[i];
+                if (p.z < -0.15) {
+                    continue;
+                }
+                const front = (p.z + 1) / 2;
+                const style = nodeStyle[i];
+                let r = 1.6 * p.s;
+                let alpha = 0.3 + front * 0.5;
+                if (style.type === 1) {
+                    r = 2.6 * p.s;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, r + 3.4 * p.s, 0, Math.PI * 2);
+                    ctx.strokeStyle = `hsla(${style.hue}, 95%, 80%, ${0.16 + front * 0.5})`;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                } else if (style.type === 2) {
+                    r = 1 * p.s;
+                    alpha = 0.26 + front * 0.45;
+                }
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `hsla(${style.hue}, 100%, 82%, ${Math.min(1, alpha)})`;
+                ctx.fill();
+            }
+        };
+
+        // West-to-east spin: a steadily increasing angle drives the front
+        // surface left -> right, matching the real Earth's eastward rotation.
+        const speed = (Math.PI * 2) / 26000; // ~26s per full rotation
+
+        if (reduceMotion) {
+            project(0);
+            draw();
+            return;
+        }
+
+        let start = null;
+        const frame = (now) => {
+            if (start === null) {
+                start = now;
+            }
+            project((now - start) * speed);
+            draw();
+            requestAnimationFrame(frame);
+        };
+        requestAnimationFrame(frame);
+    };
+
     const initSolutionMesh = () => {
         if (!window.PolygonMesh) {
             return;
@@ -423,6 +627,7 @@
         runFirstViewReveal();
     }
     window.addEventListener('load', initPerformanceSection);
+    window.addEventListener('load', initPerformanceEarth);
     window.addEventListener('load', initSolutionMesh);
     window.addEventListener('load', initSolutionSection);
     window.addEventListener('load', initAppScene);
