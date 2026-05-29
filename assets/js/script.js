@@ -1,8 +1,5 @@
 (function () {
     const canvas = document.querySelector('.first-view__particles');
-    const intro = document.querySelector('.fv-intro');
-    const introMaskPosition = intro?.querySelector('.fv-intro__mask-position');
-    const orbitLine = intro?.querySelector('.fv-intro__orbit-line');
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const revealContent = () => {
@@ -13,103 +10,137 @@
         });
     };
 
-    const buildRotatedEllipseArc = ({
-        cx,
-        cy,
-        rx,
-        ry,
-        rotationDeg,
-        startDeg,
-        endDeg,
-        segments
-    }) => {
-        const rotation = (rotationDeg * Math.PI) / 180;
-        const cosR = Math.cos(rotation);
-        const sinR = Math.sin(rotation);
-        const start = (startDeg * Math.PI) / 180;
-        const end = (endDeg * Math.PI) / 180;
-        const step = (end - start) / segments;
-        const points = [];
+    // Build a conical-helix path: counter-clockwise, starting at the cone
+    // apex (top-right, radius 0) and spiralling out to the base centred on
+    // the bottom-left. Because the base radius spans the full diagonal, the
+    // (thick-stroked) spiral sweeps across — and fully covers — the viewport.
+    // Also returns the cumulative arc length at each sample so the reveal can
+    // be paced evenly by the spiral parameter for a smooth leading edge.
+    const buildSpiralPath = (width, height, turns, baseRadius, tMax) => {
+        const startX = width; // top-right apex
+        const startY = 0;
+        const endX = 0;       // bottom-left base centre
+        const endY = height;
+        const steps = Math.max(720, Math.ceil(turns * 160));
+        const last = Math.round(steps * tMax);
+        const cumulative = new Array(last + 1);
+        let d = '';
+        let prevX = 0;
+        let prevY = 0;
+        let total = 0;
 
-        for (let index = 0; index <= segments; index += 1) {
-            const angle = start + step * index;
-            const cosA = Math.cos(angle);
-            const sinA = Math.sin(angle);
-            const x = cx + rx * cosA * cosR - ry * sinA * sinR;
-            const y = cy + rx * cosA * sinR + ry * sinA * cosR;
-            points.push(`${x.toFixed(3)},${y.toFixed(3)}`);
+        for (let index = 0; index <= last; index += 1) {
+            const t = index / steps;
+            const cx = startX + (endX - startX) * t;
+            const cy = startY + (endY - startY) * t;
+            const radius = baseRadius * t;            // 0 at apex → max at base
+            const angle = -2 * Math.PI * turns * t;   // counter-clockwise (y-down)
+            const x = cx + radius * Math.cos(angle);
+            const y = cy + radius * Math.sin(angle);
+
+            if (index === 0) {
+                d += `M${x.toFixed(2)} ${y.toFixed(2)} `;
+                cumulative[index] = 0;
+            } else {
+                d += `L${x.toFixed(2)} ${y.toFixed(2)} `;
+                total += Math.hypot(x - prevX, y - prevY);
+                cumulative[index] = total;
+            }
+
+            prevX = x;
+            prevY = y;
         }
 
-        return `M ${points[0]} ${points.slice(1).map((point) => `L ${point}`).join(' ')}`;
+        return { d: d.trim(), cumulative, total };
     };
 
-    const runIntroAnimation = () => {
-        if (!intro || !introMaskPosition || !window.gsap || reduceMotion) {
-            intro?.remove();
+    const runFirstViewReveal = () => {
+        const introEl = document.getElementById('fv-intro');
+        if (!introEl) {
             revealContent();
             return;
         }
 
-        const orbitPath = buildRotatedEllipseArc({
-            cx: 50,
-            cy: 50,
-            rx: 37.5,
-            ry: 18.8,
-            rotationDeg: 135,
-            startDeg: -90,
-            endDeg: 90,
-            segments: 160
-        });
+        const finish = () => {
+            introEl.classList.add('is-done');
+            revealContent();
+            window.setTimeout(() => introEl.remove(), 600);
+        };
 
-        if (orbitLine) {
-            orbitLine.setAttribute('d', orbitPath);
-            const orbitLength = orbitLine.getTotalLength();
-            orbitLine.style.strokeDasharray = `${orbitLength}`;
-            orbitLine.style.strokeDashoffset = `${orbitLength}`;
+        if (reduceMotion) {
+            finish();
+            return;
         }
 
-        const timeline = window.gsap.timeline({
-            defaults: {
-                ease: 'power2.inOut'
-            },
-            onComplete: () => {
-                intro.remove();
-                revealContent();
-            }
-        });
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const turns = 9;
+        const diagonal = Math.hypot(width, height);
+        const baseRadius = diagonal * 1.12;
+        // Stroke covers both the radial growth and the centre's travel per
+        // turn, so consecutive coils overlap and leave no gaps.
+        const strokeWidth = ((baseRadius + diagonal) / turns) * 1.18;
+        // Stop right where coverage completes (the bottom-left corner clears
+        // last) so the timeline isn't padded with an invisible tail.
+        const tMax = 0.47;
+        const { d: path, cumulative, total } = buildSpiralPath(width, height, turns, baseRadius, tMax);
+        const region = `x="${-2 * width}" y="${-2 * height}" width="${5 * width}" height="${5 * height}"`;
 
-        timeline
-            .set(introMaskPosition, {
-                x: 28,
-                y: -28,
-                scale: 0.08,
-                rotate: 0
-            })
-            .to(orbitLine, {
-                opacity: 1,
-                duration: 0.25
-            }, 0)
-            .to(orbitLine, {
-                strokeDashoffset: 0,
-                duration: 1.25,
-                ease: 'power2.out'
-            }, 0.08)
-            .to(introMaskPosition, {
-                x: -26,
-                y: 26,
-                scale: 2.95,
-                rotate: 20,
-                duration: 1.45,
-                ease: 'power3.inOut'
-            }, 0.18)
-            .to(orbitLine, {
-                opacity: 0,
-                duration: 0.22
-            }, 1.18)
-            .to(intro, {
-                opacity: 0,
-                duration: 0.26
-            }, 1.34);
+        introEl.style.background = 'transparent';
+        introEl.innerHTML = `
+            <svg class="fv-intro__svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <mask id="fvRevealMask" maskUnits="userSpaceOnUse" ${region}>
+                        <rect width="${width}" height="${height}" fill="#ffffff"></rect>
+                        <path class="fv-intro__spiral" d="${path}" fill="none" stroke="#000000" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </mask>
+                </defs>
+                <rect width="${width}" height="${height}" fill="#ffffff" mask="url(#fvRevealMask)"></rect>
+            </svg>`;
+
+        const spiral = introEl.querySelector('.fv-intro__spiral');
+        if (!spiral) {
+            finish();
+            return;
+        }
+
+        const segments = cumulative.length - 1;
+        spiral.style.strokeDasharray = `${total}`;
+        spiral.style.strokeDashoffset = `${total}`;
+
+        const duration = 2500;
+        // Gentle symmetric ease (sine) for a soft start and a soft landing.
+        const easeInOutSine = (p) => -(Math.cos(Math.PI * p) - 1) / 2;
+        const fadeStart = 0.86; // dissolve the final sliver to avoid a hard stop
+        let startTime = null;
+
+        const step = (now) => {
+            if (startTime === null) {
+                startTime = now;
+            }
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = easeInOutSine(progress);
+
+            // Pace by spiral parameter (even leading-edge motion), mapping the
+            // eased progress through the arc-length table.
+            const pointer = eased * segments;
+            const lower = Math.min(Math.floor(pointer), segments - 1);
+            const frac = pointer - lower;
+            const drawn = cumulative[lower] + (cumulative[lower + 1] - cumulative[lower]) * frac;
+            spiral.style.strokeDashoffset = `${total - drawn}`;
+
+            if (progress > fadeStart) {
+                introEl.style.opacity = `${Math.max(0, 1 - (progress - fadeStart) / (1 - fadeStart))}`;
+            }
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                finish();
+            }
+        };
+
+        requestAnimationFrame(step);
     };
 
     const initPerformanceSection = () => {
@@ -385,7 +416,12 @@
     };
 
     window.addEventListener('DOMContentLoaded', initHeaderMenu);
-    window.addEventListener('load', runIntroAnimation);
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', runFirstViewReveal);
+    } else {
+        runFirstViewReveal();
+    }
     window.addEventListener('load', initPerformanceSection);
     window.addEventListener('load', initSolutionMesh);
     window.addEventListener('load', initSolutionSection);
