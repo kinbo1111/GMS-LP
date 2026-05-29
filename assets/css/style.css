@@ -652,24 +652,25 @@ fieldset {
   font-size: 84px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
   color: #fff;
 }
 #solution .solution__subtitle {
+  width: 100%;
   margin: 0 auto 48px;
-  max-width: 900px;
   text-align: center;
   font-family: kozuka-bold;
   font-size: 25px;
   font-weight: 700;
   line-height: 1.6;
   color: #fff;
+  text-align: center;
 }
 #solution .solution__stage {
   position: relative;
   width: 100%;
   max-width: 1240px;
-  min-height: 720px;
+  min-height: calc(100vh - 200px);
   margin: 0 auto;
   padding: 64px 0;
 }
@@ -703,18 +704,18 @@ fieldset {
   left: 0;
 }
 #solution .solution__card--bottom-left {
-  bottom: 8%;
+  bottom: 0;
   left: 8%;
 }
 #solution .solution__card--bottom-right {
   right: 23%;
-  bottom: 16%;
+  bottom: 10%;
   text-align: right;
 }
 #solution .solution__card-lead {
   font-family: kozuka-bold;
   font-size: 22px;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.5;
   color: #fff;
   text-align: center;
@@ -830,7 +831,7 @@ fieldset {
 #platform .platform__subtitle {
   margin-top: 16px;
   font-family: kozuka-bold;
-  font-size: 18px;
+  font-size: 25px;
   font-weight: 700;
   color: #fff;
 }
@@ -890,8 +891,8 @@ fieldset {
 }
 #platform .platform__step-title {
   font-family: kozuka-bold;
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 500;
   line-height: 1.5;
   color: #fff;
   margin-bottom: 22px;
@@ -903,14 +904,14 @@ fieldset {
 }
 #platform .platform__step-desc {
   font-family: kozuka-bold;
-  font-size: 16px;
-  font-weight: 500;
-  line-height: 1.9;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.6;
   color: #fff;
 }
 @media (max-width: 768px) {
   #platform .platform__step-desc {
-    font-size: 14px;
+    font-size: 18px;
   }
 }
 #platform .platform__step-art {
@@ -979,10 +980,10 @@ fieldset {
   padding-top: 150px;
   text-align: center;
   font-family: kozuka-bold;
-  font-size: 84px;
+  font-size: 80px;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   color: #fff;
 }
 @media (max-width: 1024px) {
@@ -995,7 +996,7 @@ fieldset {
   margin: 20px 0 72px;
   text-align: center;
   font-family: kozuka-bold;
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 700;
   line-height: 1.6;
   color: #fff;
@@ -1029,8 +1030,8 @@ fieldset {
 }
 #sdg .sdg__lead {
   font-family: kozuka-bold;
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 30px;
+  font-weight: 500;
   line-height: 1.4;
   color: #fff;
   margin-bottom: 28px;
@@ -1042,24 +1043,24 @@ fieldset {
 }
 #sdg .sdg__text {
   font-family: kozuka-bold;
-  font-size: 17px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 400;
   line-height: 2;
   color: #fff;
   margin-bottom: 20px;
 }
 @media (max-width: 768px) {
   #sdg .sdg__text {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 #sdg .sdg__note {
   font-family: kozuka-bold;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.78);
   margin-bottom: 36px;
+  color: white;
 }
 #sdg .sdg__goals {
   display: flex;
@@ -1175,7 +1176,7 @@ fieldset {
 #sdg .sdg__closing-title {
   font-family: kozuka-bold;
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.6;
   color: #fff;
   margin-bottom: 36px;
@@ -1187,27 +1188,27 @@ fieldset {
 }
 #sdg .sdg__closing-text {
   font-family: kozuka-bold;
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 400;
   line-height: 2;
   color: #fff;
 }
 @media (max-width: 768px) {
   #sdg .sdg__closing-text {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 #sdg .sdg__closing-cta {
   font-family: kozuka-bold;
-  font-size: 46px;
-  font-weight: 700;
+  font-size: 66px;
+  font-weight: 500;
   line-height: 1.4;
   color: #fff;
   margin-top: 40px;
 }
 @media (max-width: 768px) {
   #sdg .sdg__closing-cta {
-    font-size: 30px;
+    font-size: 48px;
   }
 }
 
