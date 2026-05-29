@@ -350,8 +350,8 @@
         requestAnimationFrame(frame);
     };
 
-    const initPerformanceNebula = () => {
-        const canvas = document.querySelector('.performance__nebula');
+    const initNebula = (selector) => {
+        const canvas = document.querySelector(selector);
         if (!canvas) {
             return;
         }
@@ -639,13 +639,6 @@
         animate();
     };
 
-    const initSolutionMesh = () => {
-        if (!window.PolygonMesh) {
-            return;
-        }
-        window.PolygonMesh.initAll('[data-polygon-mesh]');
-    };
-
     const initSolutionSection = () => {
         const section = document.querySelector('.solution');
         if (!section) {
@@ -821,10 +814,11 @@
         window.addEventListener('load', runFirstViewReveal);
     }
     window.addEventListener('load', initPerformanceSection);
-    window.addEventListener('load', initPerformanceNebula);
+    window.addEventListener('load', () => initNebula('.performance__nebula'));
+    window.addEventListener('load', () => initNebula('.platform__nebula'));
+    window.addEventListener('load', () => initNebula('.solution__nebula'));
     window.addEventListener('load', initPerformanceEarth);
     window.addEventListener('load', initPerformanceGlobe);
-    window.addEventListener('load', initSolutionMesh);
     window.addEventListener('load', initSolutionSection);
     window.addEventListener('load', initAppScene);
 
