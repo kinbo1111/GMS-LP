@@ -364,6 +364,8 @@ fieldset {
   background-position: center;
   background-repeat: no-repeat;
   opacity: 0.5;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 90%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 55%, transparent 90%);
 }
 #first-view .first-view__inner {
   position: relative;
@@ -380,24 +382,27 @@ fieldset {
 #first-view .first-view__inner .first-view__content h1 {
   font-family: shin-bold;
   font-size: 80px;
-  font-weight: 700;
+  font-weight: 800;
   color: #fff;
   line-height: 1.1;
+  letter-spacing: 0;
 }
 #first-view .first-view__inner .first-view__content h3 {
   font-family: kozuka-bold;
   font-size: 37px;
   font-weight: 700;
   color: #fff;
-  margin-bottom: 24px;
+  margin-top: 16px;
+  margin-bottom: 32px;
   line-height: 1.1;
+  letter-spacing: 0;
 }
 #first-view .first-view__inner .first-view__content p {
   font-family: kozuka-bold;
   font-size: 24px;
   font-weight: 500;
   color: #fff;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
 }
 #first-view .first-view__inner .first-view__content .first-view__btn {
   font-family: kozuka-bold;
@@ -538,7 +543,8 @@ fieldset {
   font-size: 84px;
   font-weight: 700;
   color: #fff;
-  line-height: 1.1;
+  line-height: 1;
+  margin-bottom: 8px;
 }
 #performance .performance__inner .performance__subtitle {
   font-family: kozuka-bold;
@@ -550,13 +556,17 @@ fieldset {
 #performance .performance__inner .performance__list {
   position: relative;
   width: min(560px, 100%);
-  min-height: 420px;
+  min-height: 500px;
   margin-top: 24px;
 }
 #performance .performance__inner .performance__list .performance__item {
   width: 100%;
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 }
 #performance .performance__inner .performance__list .performance__item .performance__item-img {
   width: 43rem;
@@ -577,12 +587,15 @@ fieldset {
 #performance .performance__inner .performance__list .performance__item .performance__item-text {
   font-family: kozuka-bold;
   font-size: 62px;
-  font-weight: 500;
+  font-weight: 700;
   color: #fff;
+  line-height: 1;
+  margin-top: 8px;
 }
-#performance .performance__inner .performance__list .performance__item .performance__item-text span {
-  font-size: 24px;
-  font-weight: 500;
+#performance .performance__inner .performance__list .performance__item .performance__item-text-sub {
+  font-family: kozuka-bold;
+  font-size: 35px;
+  font-weight: 700;
   color: #fff;
 }
 
