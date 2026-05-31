@@ -323,7 +323,7 @@ body.is-intro {
                 justify-content: center;
                 flex-direction: column;
                 .performance__item-img {
-                    width: 43rem;
+                    width: 38rem;
                     margin-bottom: 24px;
 
                     img {
@@ -1021,6 +1021,26 @@ body.is-intro {
 
         @include md {
             font-size: 48px;
+        }
+    }
+}
+
+#partners {
+    position: relative;
+    padding: 120px 0 60px 0;
+    .partners__list {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 45px;
+        .partners__item {
+            width: 100%;
+            img {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+            }
         }
     }
 }

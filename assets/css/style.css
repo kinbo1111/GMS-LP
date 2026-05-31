@@ -611,7 +611,7 @@ body.is-intro {
   flex-direction: column;
 }
 #performance .performance__inner .performance__list .performance__item .performance__item-img {
-  width: 43rem;
+  width: 38rem;
   margin-bottom: 24px;
 }
 #performance .performance__inner .performance__list .performance__item .performance__item-img img {
@@ -1256,6 +1256,26 @@ body.is-intro {
   #sdg .sdg__closing-cta {
     font-size: 48px;
   }
+}
+
+#partners {
+  position: relative;
+  padding: 120px 0 60px 0;
+}
+#partners .partners__list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 45px;
+}
+#partners .partners__list .partners__item {
+  width: 100%;
+}
+#partners .partners__list .partners__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 #news {
