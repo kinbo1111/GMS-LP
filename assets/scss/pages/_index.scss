@@ -2,20 +2,49 @@
     background: radial-gradient(ellipse 147% 100% at center, #003b79 0%, #000c63 100%);
 }
 
+@property --fv-reveal {
+    syntax: '<length>';
+    inherits: false;
+    initial-value: 0px;
+}
+
+@keyframes fv-semicircle-reveal {
+    from {
+        --fv-reveal: 0px;
+    }
+
+    to {
+        --fv-reveal: 160vmax;
+    }
+}
+
 .fv-intro {
     position: fixed;
     inset: 0;
     z-index: 9999;
     background-color: #ffffff;
-    pointer-events: none;
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: auto;
+    --fv-reveal: 0px;
+    -webkit-mask-image: radial-gradient(
+        circle at 100% 0%,
+        transparent var(--fv-reveal),
+        #000 calc(var(--fv-reveal) + 1px)
+    );
+    mask-image: radial-gradient(
+        circle at 100% 0%,
+        transparent var(--fv-reveal),
+        #000 calc(var(--fv-reveal) + 1px)
+    );
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+
+    &.is-revealing {
+        animation: fv-semicircle-reveal 1.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
 
     &.is-hidden {
-        opacity: 0;
         visibility: hidden;
-        transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s linear 0.8s;
+        pointer-events: none;
     }
 }
 
@@ -27,16 +56,10 @@ body.is-intro {
     position: relative;
     width: 100%;
     height: 100vh;
-    opacity: 0;
+    opacity: 1;
     pointer-events: none;
-    transform: scale(1.08);
-    transform-origin: 50% 45%;
-    transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
 
     &.is-revealed {
-        transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-        opacity: 1;
         pointer-events: all;
 
         .first-view__inner {

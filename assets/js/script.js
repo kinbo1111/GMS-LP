@@ -10,7 +10,7 @@
         });
     };
 
-    const INTRO_MIN_DURATION = 600;
+    const INTRO_REVEAL_DURATION = 1450;
     const introStart = Date.now();
 
     const lockIntroScroll = () => {
@@ -19,34 +19,55 @@
         }
     };
 
+    const finishFirstViewReveal = (firstView, intro) => {
+        if (firstView) {
+            firstView.classList.add('is-revealed');
+        }
+        if (intro) {
+            intro.classList.remove('is-revealing');
+            intro.classList.add('is-hidden');
+        }
+        if (document.body) {
+            document.body.classList.remove('is-intro');
+        }
+        revealContent();
+    };
+
     const runFirstViewReveal = () => {
         const firstView = document.getElementById('first-view');
         const intro = document.getElementById('fv-intro');
 
-        const reveal = () => {
-            if (firstView) {
-                firstView.classList.add('is-revealed');
-            }
-            if (intro) {
-                intro.classList.add('is-hidden');
-            }
-            if (document.body) {
-                document.body.classList.remove('is-intro');
-            }
-            revealContent();
-        };
-
-        if (reduceMotion || !firstView) {
-            reveal();
+        if (reduceMotion || !intro) {
+            finishFirstViewReveal(firstView, intro);
             return;
         }
 
-        const elapsed = Date.now() - introStart;
-        const wait = Math.max(INTRO_MIN_DURATION - elapsed, 0);
+        const startReveal = () => {
+            const complete = () => finishFirstViewReveal(firstView, intro);
 
-        window.setTimeout(() => {
-            requestAnimationFrame(() => requestAnimationFrame(reveal));
-        }, wait);
+            if (window.gsap) {
+                intro.style.setProperty('--fv-reveal', '0px');
+                window.gsap.to(intro, {
+                    '--fv-reveal': `${Math.hypot(window.innerWidth, window.innerHeight) * 1.25}px`,
+                    duration: 1.45,
+                    ease: 'power2.inOut',
+                    onComplete: complete
+                });
+                return;
+            }
+
+            intro.classList.add('is-revealing');
+            intro.addEventListener('animationend', complete, { once: true });
+            window.setTimeout(() => {
+                if (!intro.classList.contains('is-hidden')) {
+                    complete();
+                }
+            }, INTRO_REVEAL_DURATION + 120);
+        };
+
+        const elapsed = Date.now() - introStart;
+        const wait = Math.max(300 - elapsed, 0);
+        window.setTimeout(startReveal, wait);
     };
 
     lockIntroScroll();
