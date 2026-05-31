@@ -4,9 +4,43 @@
 
     const revealContent = () => {
         document.body.classList.add('is-loaded');
-        document.querySelectorAll('.first-view__title, .first-view__lead, .first-view__text, .first-view__button').forEach((element) => {
+    };
+
+    const animateFirstViewContent = (firstView) => {
+        if (!firstView) {
+            return;
+        }
+
+        const items = firstView.querySelectorAll('.first-view__content > *');
+        if (!items.length) {
+            return;
+        }
+
+        if (reduceMotion) {
+            items.forEach((element) => {
+                element.style.opacity = '1';
+            });
+            return;
+        }
+
+        if (window.gsap) {
+            firstView.classList.add('is-content-animated');
+            window.gsap.set(items, { opacity: 0 });
+            const timeline = window.gsap.timeline({ delay: 0.15 });
+
+            items.forEach((item) => {
+                timeline.to(item, {
+                    opacity: 1,
+                    duration: 0.65,
+                    ease: 'power2.out'
+                });
+            });
+
+            return;
+        }
+
+        items.forEach((element) => {
             element.style.opacity = '1';
-            element.style.transform = 'none';
         });
     };
 
@@ -22,6 +56,7 @@
     const finishFirstViewReveal = (firstView, intro) => {
         if (firstView) {
             firstView.classList.add('is-revealed');
+            animateFirstViewContent(firstView);
         }
         if (intro) {
             intro.classList.remove('is-revealing');
@@ -124,6 +159,8 @@
             scale: 1
         });
 
+        const stepDuration = 1;
+
         const timeline = window.gsap.timeline({
             defaults: {
                 ease: 'power2.out',
@@ -153,6 +190,9 @@
             }
         });
 
+        // Hold the first item before any transition (avoids .set() at t=0 hiding item 0)
+        timeline.to({}, { duration: stepDuration });
+
         for (let index = 1; index < totalCount; index += 1) {
             timeline
                 .set(itemArray[index - 1], {
@@ -164,9 +204,10 @@
                     autoAlpha: 1,
                     y: 0,
                     scale: 1,
-                    duration: 0.2,
+                    duration: stepDuration * 0.35,
                     ease: 'power3.out'
-                });
+                })
+                .to({}, { duration: stepDuration * 0.65 });
         }
     };
 
@@ -705,41 +746,28 @@
         animate();
     };
 
-    const initSolutionSection = () => {
-        const section = document.querySelector('.solution');
-        if (!section) {
+    const initSolutionWow = () => {
+        const cards = document.querySelectorAll('.solution__card.wow');
+
+        if (reduceMotion) {
+            cards.forEach((card) => {
+                card.style.visibility = 'visible';
+                card.classList.add('animated');
+            });
             return;
         }
 
-        const targets = section.querySelectorAll('.solution__visual, .solution__card');
-        if (!targets.length) {
+        if (typeof window.WOW === 'undefined') {
             return;
         }
 
-        if (!window.gsap || !window.ScrollTrigger || reduceMotion) {
-            return;
-        }
-
-        window.gsap.registerPlugin(window.ScrollTrigger);
-
-        window.gsap.set(targets, {
-            autoAlpha: 0,
-            scale: 0.15,
-            transformOrigin: '50% 50%'
-        });
-
-        window.gsap.to(targets, {
-            autoAlpha: 1,
-            scale: 1,
-            duration: 0.28,
-            ease: 'power3.out',
-            stagger: 0.1,
-            scrollTrigger: {
-                trigger: section,
-                start: 'top 72%',
-                once: true
-            }
-        });
+        new window.WOW({
+            boxClass: 'wow',
+            animateClass: 'animated',
+            offset: 80,
+            mobile: true,
+            live: false
+        }).init();
     };
 
     const initAppScene = () => {
@@ -886,7 +914,7 @@
     window.addEventListener('load', () => initSectionNebulae('sdg'));
     window.addEventListener('load', initPerformanceEarth);
     window.addEventListener('load', initPerformanceGlobe);
-    window.addEventListener('load', initSolutionSection);
+    window.addEventListener('load', initSolutionWow);
     window.addEventListener('load', initAppScene);
 
     if (!canvas || reduceMotion) {
