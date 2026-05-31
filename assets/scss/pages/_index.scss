@@ -443,7 +443,7 @@ body.is-intro {
     position: relative;
     width: 100%;
     overflow: hidden;
-    padding: 0 0 160px;
+    padding: 100px 0;
 
     @include section-nebula-quadrants('platform');
 
@@ -683,7 +683,7 @@ body.is-intro {
     position: relative;
     width: 100%;
     overflow: hidden;
-    padding: 0 0 120px;
+    padding: 100px 0;
 
     @keyframes solutionCardZoomOut {
         from {
@@ -814,8 +814,11 @@ body.is-intro {
             width: 100%;
             min-height: calc(100vh - 200px);
             margin: 0 auto;
-            padding: 64px 0;
-
+            padding-top: 0;
+            padding-bottom: 84px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             @include lg {
                 display: flex;
                 flex-direction: column;
@@ -826,22 +829,8 @@ body.is-intro {
             }
 
             .solution__visual {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                z-index: 1;
-                width: min(82%, 1120px);
-                transform: translate(-50%, -48%);
-
-                @include lg {
-                    position: static;
-                    z-index: auto;
-                    order: 2;
-                    width: 100%;
-                    max-width: min(100%, 360px);
-                    margin: 0 auto;
-                    transform: none;
-                }
+                width: 100%;
+                max-width: 110rem;
 
                 img {
                     display: block;
@@ -976,7 +965,7 @@ body.is-intro {
     position: relative;
     width: 100%;
     overflow: hidden;
-    padding: 0 0 100px;
+    padding: 100px 0;
 
     @include section-nebula-quadrants('sdg');
 
