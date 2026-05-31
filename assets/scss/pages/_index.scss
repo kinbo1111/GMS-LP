@@ -630,26 +630,31 @@ body.is-intro {
     .platform__flow {
         position: relative;
         margin-top: 40px;
-    }
-
-    .platform__stream {
-        position: absolute;
-        top: -60px;
-        bottom: -120px;
-        left: 67%;
-        transform: translateX(-50%);
-        width: 280px;
-        z-index: 1;
-        pointer-events: none;
-
-        img {
-            display: block;
-            width: 100%;
-            height: 100%;
+        &::before {
+            content: "";
+            position: absolute;
+            top: 15%;
+            right: 0;
+            width: 16.8rem;
+            height: 72.4rem;
+            background-image: url(../images/platform_stream.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transform: translateX(-50%);
         }
-
-        @include lg {
-            display: none;
+        &::after {
+            content: "";
+            position: absolute;
+            bottom: 5%;
+            right: 0;
+            width: 16.8rem;
+            height: 72.4rem;
+            background-image: url(../images/platform_stream.png);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transform: translateX(-50%);
         }
     }
 
@@ -657,6 +662,7 @@ body.is-intro {
         position: relative;
         z-index: 2;
         display: flex;
+        justify-content: space-between;
         align-items: center;
         min-height: 340px;
 
@@ -673,10 +679,39 @@ body.is-intro {
                 margin-top: 64px;
             }
         }
+        &--1 {
+            .platform__step-art {
+                img:nth-child(1){
+                    width: 14.7rem;
+                    height: auto;
+                }
+                img:nth-child(2){
+                    width: auto;
+                    height: 25rem;
+                }
+            }
+        }
+        &--2 {
+            .platform__step-art {
+                img {
+                    width: auto;
+                    height: 27.5rem;
+                }
+            }
+        }
+        &--3 {
+            .platform__step-art {
+                img {
+                    width: auto;
+                    height: 34rem;
+                }
+            }
+        }
+
     }
 
     .platform__step-text {
-        width: 42%;
+        width: fit-content;
         flex-shrink: 0;
 
         @include lg {
@@ -711,10 +746,11 @@ body.is-intro {
     }
 
     .platform__step-art {
-        width: 38%;
-        margin-left: 6%;
+        width: fit-content;
         display: flex;
         justify-content: center;
+        align-items: center;
+        flex-direction: column;
 
         img {
             width: 100%;
