@@ -17,7 +17,7 @@ body.is-nav-open {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 0;
+      padding: 12px;
       .header__logo {
         width: 164px;
         z-index: 120;
@@ -58,7 +58,6 @@ body.is-nav-open {
       }
   }
 
-  // ── Hamburger toggle (hidden on desktop) ───────────────────────────
   .header__toggle {
     display: none;
     flex-direction: column;
@@ -83,7 +82,6 @@ body.is-nav-open {
     }
   }
 
-  // ── Backdrop (only visible while the drawer is open) ───────────────
   .header__overlay {
     position: fixed;
     inset: 0;
@@ -94,7 +92,6 @@ body.is-nav-open {
     transition: opacity 0.35s ease, visibility 0.35s ease;
   }
 
-  // ── Tablet / mobile: turn the nav into a slide-in drawer ───────────
   @include lg {
     padding: 12px 0;
 
@@ -142,7 +139,6 @@ body.is-nav-open {
     }
   }
 
-  // ── Open state ─────────────────────────────────────────────────────
   &.is-open {
     .header__inner .header__nav {
       transform: translateX(0);

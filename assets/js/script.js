@@ -371,8 +371,7 @@
         requestAnimationFrame(frame);
     };
 
-    const initNebula = (selector) => {
-        const canvas = document.querySelector(selector);
+    const initNebulaCanvas = (canvas, options = {}) => {
         if (!canvas) {
             return;
         }
@@ -384,16 +383,17 @@
             soft: [150, 180, 255]
         };
 
-        const coreSeeds = [
+        const defaultCoreSeeds = [
             { x: 0.13, y: 0.22, scale: 1.0, color: palette.cyan },
             { x: 0.16, y: 0.76, scale: 0.9, color: palette.blue },
             { x: 0.84, y: 0.2, scale: 1.05, color: palette.cyan },
             { x: 0.86, y: 0.78, scale: 0.95, color: palette.blue }
         ];
 
-        const GLOW_COUNT = 26;
-        const PARTICLE_COUNT = 70;
-        const CONNECT = 150;
+        const coreSeeds = options.coreSeeds || defaultCoreSeeds;
+        const GLOW_COUNT = options.glowCount ?? 26;
+        const PARTICLE_COUNT = options.particleCount ?? 70;
+        const CONNECT = options.connect ?? 150;
 
         let W = 0;
         let H = 0;
@@ -560,6 +560,51 @@
             requestAnimationFrame(frame);
         };
         requestAnimationFrame(frame);
+    };
+
+    const initNebula = (selector, options = {}) => {
+        document.querySelectorAll(selector).forEach((canvas) => {
+            initNebulaCanvas(canvas, options);
+        });
+    };
+
+    const initSectionNebulae = (prefix) => {
+        const palette = {
+            blue: [100, 150, 255],
+            cyan: [50, 200, 230]
+        };
+
+        const quadrantOptions = {
+            '--left-top': [
+                { x: 0.62, y: 0.38, scale: 1.0, color: palette.cyan },
+                { x: 0.34, y: 0.68, scale: 0.88, color: palette.blue }
+            ],
+            '--left-bottom': [
+                { x: 0.58, y: 0.42, scale: 0.95, color: palette.blue },
+                { x: 0.32, y: 0.72, scale: 0.9, color: palette.cyan }
+            ],
+            '--right-top': [
+                { x: 0.38, y: 0.36, scale: 1.05, color: palette.cyan },
+                { x: 0.66, y: 0.66, scale: 0.92, color: palette.blue }
+            ],
+            '--right-bottom': [
+                { x: 0.42, y: 0.44, scale: 1.0, color: palette.blue },
+                { x: 0.68, y: 0.74, scale: 0.94, color: palette.cyan }
+            ]
+        };
+
+        document.querySelectorAll(`.${prefix}__nebula`).forEach((canvas) => {
+            const suffix = Object.keys(quadrantOptions).find((name) =>
+                canvas.classList.contains(`${prefix}__nebula${name}`)
+            );
+
+            initNebulaCanvas(canvas, {
+                coreSeeds: quadrantOptions[suffix],
+                glowCount: 14,
+                particleCount: 36,
+                connect: 110
+            });
+        });
     };
 
     const GLOBE_COLOR = 0x4db8ff;
@@ -835,9 +880,10 @@
         window.addEventListener('load', runFirstViewReveal);
     }
     window.addEventListener('load', initPerformanceSection);
-    window.addEventListener('load', () => initNebula('.performance__nebula'));
-    window.addEventListener('load', () => initNebula('.platform__nebula'));
-    window.addEventListener('load', () => initNebula('.solution__nebula'));
+    window.addEventListener('load', () => initSectionNebulae('performance'));
+    window.addEventListener('load', () => initSectionNebulae('platform'));
+    window.addEventListener('load', () => initSectionNebulae('solution'));
+    window.addEventListener('load', () => initSectionNebulae('sdg'));
     window.addEventListener('load', initPerformanceEarth);
     window.addEventListener('load', initPerformanceGlobe);
     window.addEventListener('load', initSolutionSection);
