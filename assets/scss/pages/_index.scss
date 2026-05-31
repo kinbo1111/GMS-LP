@@ -864,13 +864,13 @@ body.is-intro {
     }
 
     .sdg__goals {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 14px;
-        list-style: none;
-        margin: 0 0 44px;
-        padding: 0;
+        position: relative;
+        max-width: 41rem;
+        margin: 0 auto 36px;
+        img {
+            width: 100%;
+            height: auto;
+        }
     }
 
     .sdg__goal {
