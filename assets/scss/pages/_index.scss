@@ -103,12 +103,22 @@ body.is-intro {
 #first-view {
     position: relative;
     width: 100%;
-    height: 100vh;
+    min-height: 100vh;
+    padding: 128px 0 56px;
     opacity: 1;
     pointer-events: none;
     display: flex;
     align-items: center;
     justify-content: flex-start;
+
+    @include lg {
+        padding-top: 104px;
+    }
+
+    @include sm {
+        padding: 96px 0 48px;
+    }
+
     &.is-revealed {
         pointer-events: all;
 
@@ -144,7 +154,6 @@ body.is-intro {
     .first-view__inner {
         position: relative;
         width: 100%;
-        height: 100%;
         display: flex;
         align-items: center;
         justify-content: flex-start;
@@ -159,7 +168,7 @@ body.is-intro {
 
             h1 {
                 font-family: shin-bold;
-                font-size: 80px;
+                font-size: clamp(60px, 4.81vw + 10.77px, 80px);
                 font-weight: 800;
                 color: #fff;
                 line-height: 1.1;
@@ -168,7 +177,7 @@ body.is-intro {
 
             h3 {
                 font-family: kozuka-bold;
-                font-size: 37px;
+                font-size: clamp(30px, 1.68vw + 12.8px, 37px);
                 font-weight: 700;
                 color: #fff;
                 margin-top: 16px;
@@ -296,7 +305,6 @@ body.is-intro {
 #performance {
     position: relative;
     width: 100%;
-    height: 100vh;
     min-height: 100vh;
     overflow: hidden;
 
@@ -339,11 +347,20 @@ body.is-intro {
     .performance__inner {
         position: relative;
         z-index: 2;
-        height: 100vh;
+        min-height: 100vh;
         width: 100%;
+        padding: 128px 0 56px;
         display: flex;
         align-items: center;
         justify-content: flex-start;
+
+        @include lg {
+            padding-top: 104px;
+        }
+
+        @include sm {
+            padding: 96px 0 48px;
+        }
 
         .performance__content {
             max-width: 55rem;
@@ -351,7 +368,7 @@ body.is-intro {
 
             h2 {
                 font-family: kozuka-bold;
-                font-size: 84px;
+                font-size: clamp(56px, 6.73vw - 12.9px, 84px);
                 font-weight: 700;
                 color: #fff;
                 line-height: 1;
