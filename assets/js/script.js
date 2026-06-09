@@ -125,6 +125,67 @@
         const firstItem = itemArray[0];
         const totalCount = itemArray.length;
 
+        const slotGroups = itemArray.map((item) => {
+            const value = item.querySelector('.performance__item-text');
+            if (!value) {
+                return [];
+            }
+
+            const originalText = (value.textContent || '').trim();
+            const match = originalText.match(/^(\d+)(.*)$/);
+            if (!match) {
+                return [];
+            }
+
+            const digits = match[1];
+            const unit = match[2] || '';
+            const fragment = document.createDocumentFragment();
+            const slots = [];
+
+            for (const digitChar of digits) {
+                const targetDigit = Number(digitChar);
+                if (!Number.isFinite(targetDigit)) {
+                    continue;
+                }
+
+                const slot = document.createElement('span');
+                slot.className = 'performance__value-slot';
+
+                const reel = document.createElement('span');
+                reel.className = 'performance__value-reel';
+
+                const sequence = [];
+                for (let spin = 0; spin < 2; spin += 1) {
+                    for (let n = 0; n <= 9; n += 1) {
+                        sequence.push(n);
+                    }
+                }
+                sequence.push(targetDigit);
+
+                sequence.forEach((num) => {
+                    const cell = document.createElement('span');
+                    cell.className = 'performance__value-cell';
+                    cell.textContent = String(num);
+                    reel.appendChild(cell);
+                });
+
+                reel.dataset.slotY = `${-(sequence.length - 1)}em`;
+                slot.appendChild(reel);
+                fragment.appendChild(slot);
+                slots.push(reel);
+            }
+
+            const unitSpan = document.createElement('span');
+            unitSpan.className = 'performance__value-unit';
+            unitSpan.textContent = unit;
+            fragment.appendChild(unitSpan);
+
+            value.textContent = '';
+            value.appendChild(fragment);
+
+            return slots;
+        });
+
         if (totalStep) {
             totalStep.textContent = String(totalCount).padStart(2, '0');
         }
@@ -133,6 +194,11 @@
             itemArray.forEach((item, index) => {
                 item.style.opacity = index === 0 ? '1' : '0';
                 item.style.transform = 'none';
+            });
+            slotGroups.forEach((slots) => {
+                slots.forEach((slot) => {
+                    slot.style.transform = `translateY(${slot.dataset.slotY || '0em'})`;
+                });
             });
             if (currentStep) {
                 currentStep.textContent = '01';
@@ -148,6 +214,16 @@
             scale: 0.15,
             transformOrigin: '50% 50%'
         });
+        slotGroups.forEach((slots) => {
+            if (slots.length > 0) {
+                window.gsap.set(slots, { y: '0em' });
+            }
+        });
+        if (slotGroups[0] && slotGroups[0].length > 0) {
+            window.gsap.set(slotGroups[0], {
+                y: (_, target) => target.dataset.slotY || '0em'
+            });
+        }
 
         itemArray.forEach((item, index) => {
             item.style.zIndex = `${index + 1}`;
@@ -159,56 +235,69 @@
             scale: 1
         });
 
-        const stepDuration = 1;
+        let activeIndex = 0;
 
-        const timeline = window.gsap.timeline({
-            defaults: {
-                ease: 'power2.out',
-                duration: 1
-            },
-            scrollTrigger: {
-                trigger: section,
-                start: 'top top',
-                end: `+=${(totalCount - 1) * 110}%`,
-                scrub: 0.8,
-                pin: true,
-                anticipatePin: 1,
-                snap: {
-                    snapTo: totalCount > 1 ? 1 / (totalCount - 1) : 1,
-                    duration: {
-                        min: 0.12,
-                        max: 0.28
-                    },
-                    ease: 'power1.inOut'
-                },
-                onUpdate: (self) => {
-                    const stepIndex = Math.round(self.progress * (totalCount - 1));
-                    if (currentStep) {
-                        currentStep.textContent = String(stepIndex + 1).padStart(2, '0');
-                    }
-                }
+        const runSlot = (index) => {
+            const slots = slotGroups[index];
+            if (!slots || slots.length === 0) {
+                return;
+            }
+
+            window.gsap.set(slots, { y: '0em' });
+            window.gsap.to(slots, {
+                y: (_, target) => target.dataset.slotY || '0em',
+                duration: 0.65,
+                ease: 'power3.out',
+                stagger: 0.04
+            });
+        };
+
+        const showItem = (index) => {
+            if (index === activeIndex || !itemArray[index]) {
+                return;
+            }
+
+            const previousItem = itemArray[activeIndex];
+            const nextItem = itemArray[index];
+
+            window.gsap.killTweensOf([previousItem, nextItem]);
+            window.gsap.to(previousItem, {
+                autoAlpha: 0,
+                scale: 0.92,
+                duration: 0.28,
+                ease: 'power2.out'
+            });
+            window.gsap.fromTo(nextItem, {
+                autoAlpha: 0,
+                scale: 0.92
+            }, {
+                autoAlpha: 1,
+                scale: 1,
+                duration: 0.36,
+                ease: 'power3.out'
+            });
+
+            activeIndex = index;
+            if (currentStep) {
+                currentStep.textContent = String(index + 1).padStart(2, '0');
+            }
+            runSlot(index);
+        };
+
+        window.ScrollTrigger.create({
+            trigger: section,
+            start: 'top top',
+            end: () => `+=${list.offsetHeight * totalCount}`,
+            pin: true,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+                const itemHeight = Math.max(list.offsetHeight, 1);
+                const scrollDistance = self.progress * itemHeight * totalCount;
+                const nextIndex = Math.min(totalCount - 1, Math.floor(scrollDistance / itemHeight));
+                showItem(nextIndex);
             }
         });
-
-        // Hold the first item before any transition (avoids .set() at t=0 hiding item 0)
-        timeline.to({}, { duration: stepDuration });
-
-        for (let index = 1; index < totalCount; index += 1) {
-            timeline
-                .set(itemArray[index - 1], {
-                    autoAlpha: 0,
-                    scale: 0.78,
-                    y: 0
-                })
-                .to(itemArray[index], {
-                    autoAlpha: 1,
-                    y: 0,
-                    scale: 1,
-                    duration: stepDuration * 0.35,
-                    ease: 'power3.out'
-                })
-                .to({}, { duration: stepDuration * 0.65 });
-        }
     };
 
     const initPerformanceEarth = () => {
@@ -746,6 +835,76 @@
         animate();
     };
 
+    const initSdgGallery = () => {
+        const gallery = document.querySelector('.sdg__gallery');
+        if (!gallery) {
+            return;
+        }
+
+        const reveal = () => {
+            gallery.classList.add('is-animated');
+        };
+
+        if (reduceMotion) {
+            reveal();
+            return;
+        }
+
+        if (!window.IntersectionObserver) {
+            reveal();
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    reveal();
+                    observer.disconnect();
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -10% 0px'
+        });
+
+        observer.observe(gallery);
+    };
+
+    const initPartnersList = () => {
+        const list = document.querySelector('.partners__list');
+        if (!list) {
+            return;
+        }
+
+        const reveal = () => {
+            list.classList.add('is-animated');
+        };
+
+        if (reduceMotion) {
+            reveal();
+            return;
+        }
+
+        if (!window.IntersectionObserver) {
+            reveal();
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    reveal();
+                    observer.disconnect();
+                }
+            });
+        }, {
+            threshold: 0.2,
+            rootMargin: '0px 0px -12% 0px'
+        });
+
+        observer.observe(list);
+    };
+
     const initSolutionWow = () => {
         const cards = document.querySelectorAll('.solution__card.wow');
 
@@ -912,6 +1071,8 @@
     window.addEventListener('load', () => initSectionNebulae('platform'));
     window.addEventListener('load', () => initSectionNebulae('solution'));
     window.addEventListener('load', () => initSectionNebulae('sdg'));
+    window.addEventListener('load', initSdgGallery);
+    window.addEventListener('load', initPartnersList);
     window.addEventListener('load', initPerformanceEarth);
     window.addEventListener('load', initPerformanceGlobe);
     window.addEventListener('load', initSolutionWow);
